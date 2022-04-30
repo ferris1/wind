@@ -1,7 +1,7 @@
 import uuid
 import asyncio
 import logging
-from engine.LogModule import init_logging
+from engine.logger.LogModule import init_log
 import sys
 # engine 实例
 srv_inst = None
@@ -16,8 +16,8 @@ def set_srv_instance(srv):
 class Engine:
     def __init__(self, name: str, process_pool: int = None) -> None:
         self.exiting = False
-        self.serverid: str = uuid.uuid4().hex
-        self.sid: bytes = self.serverid.encode()
+        self.server_id: str = uuid.uuid4().hex
+        self.sid: bytes = self.server_id.encode()
         self.name: str = name
 
         self.ip = "127.0.0.1"
@@ -28,13 +28,13 @@ class Engine:
         self.loop = asyncio.get_event_loop()
 
         # 以下为各个插件
-        init_logging(self)
+        init_log(self)
 
     async def init(self):
         logging.info("SrvEngine Init")
         argv_len = len(sys.argv)
         if argv_len < 2:
-            raise ValueError("端口错误!!!!! 请传递一个可使用的端口号.")
+            raise ValueError("没有传递可用窗口")
         else:
             self.port = int(sys.argv[1])
 
