@@ -1,7 +1,7 @@
 import uuid
 import asyncio
 import logging
-from engine.LogModules import init_logging
+from engine.LogModule import init_logging
 import sys
 # engine 实例
 srv_inst = None
@@ -68,4 +68,7 @@ class Engine:
         finally:
             self.loop.close()
             logging.info("loop closed!!")
+
+    def register_cmd(self, cmd_dct):
+        self.cmd_map.update(cmd_dct)
 

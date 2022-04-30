@@ -1,6 +1,7 @@
 import logging
 from engine.SrvEngine import Engine
 from engine import SrvEngine
+from engine.utils import load_all_handlers
 
 
 class GameSrv(Engine):
@@ -12,6 +13,7 @@ class GameSrv(Engine):
 
     async def register(self):
         await super(GameSrv, self).register()
+        self.register_cmd(load_all_handlers('game.handlers'))
 
     async def start(self):
         await super(GameSrv, self).start()
