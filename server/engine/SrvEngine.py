@@ -38,7 +38,6 @@ class Engine:
         else:
             self.port = int(sys.argv[1])
 
-
     async def register(self):
         pass
 
@@ -58,7 +57,7 @@ class Engine:
         logging.critical(f"################ 服务 {self.name} 启动完毕 ##############")
         logging.info("服务端口号:{}".format(self.port))
 
-    def run(self):
+    def serve(self):
         logging.getLogger().setLevel(logging.INFO)
         self.loop.run_until_complete(asyncio.ensure_future(self.launch()))
         try:

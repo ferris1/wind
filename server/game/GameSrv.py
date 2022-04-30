@@ -1,7 +1,9 @@
 import logging
 from engine.SrvEngine import Engine
 from engine import SrvEngine
-from engine.utils import load_all_handlers
+from engine.utils.utils import load_all_handlers
+from game.modules.game_player_module import GamePlayerModules
+from engine.client.ClientMgr import ClientMgr
 
 
 class GameSrv(Engine):
@@ -10,6 +12,7 @@ class GameSrv(Engine):
 
     async def init(self):
         await super().init()
+        ClientMgr().init(None, None, None)
 
     async def register(self):
         await super(GameSrv, self).register()
@@ -18,6 +21,8 @@ class GameSrv(Engine):
     async def start(self):
         await super(GameSrv, self).start()
         logging.info("start Game Srv")
+        GamePlayerModules().test_singleton()
+        GamePlayerModules().test_singleton()
 
     async def exit(self):
         await super(GameSrv, self).exit()
@@ -27,7 +32,7 @@ class GameSrv(Engine):
 def run():
     srv_inst = GameSrv()
     SrvEngine.set_srv_instance(srv_inst)
-    srv_inst.run()
+    srv_inst.serve()
 
 
 if __name__ == '__main__':
