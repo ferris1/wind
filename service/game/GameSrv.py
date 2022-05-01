@@ -2,7 +2,7 @@ import logging
 from engine.SrvEngine import Engine
 from engine import SrvEngine
 from engine.utils.utils import load_all_handlers
-from game.modules.game_player_module import GamePlayerModules
+from service.game.modules.game_player_module import GamePlayerModules
 from engine.client.ClientMgr import ClientMgr
 
 
@@ -16,7 +16,7 @@ class GameSrv(Engine):
 
     async def register(self):
         await super(GameSrv, self).register()
-        self.register_cmd(load_all_handlers('game.handlers'))
+        self.register_cmd(load_all_handlers('service.game.handlers'))
 
     async def start(self):
         await super(GameSrv, self).start()
@@ -31,7 +31,7 @@ class GameSrv(Engine):
 
 def run():
     srv_inst = GameSrv()
-    SrvEngine.set_srv_instance(srv_inst)
+    SrvEngine.srv_inst = srv_inst
     srv_inst.serve()
 
 

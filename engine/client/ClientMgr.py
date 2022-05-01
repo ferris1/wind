@@ -48,6 +48,7 @@ class ClientMgr(Singleton):
     def disconnect_client(self, conn):
         pass
 
+
 class ClientStatus(IntEnum):
     CONNECTED = 0
     DISCONNECTED = 1
@@ -55,7 +56,7 @@ class ClientStatus(IntEnum):
 
 class ClientConn:
     __slots__ = ['address', 'port', 'peer_id', 'player_id', 'session_key', 'timestamp', 'status',
-                 'session_key', 'srv']
+                 'session_key', 'srv', 'client_mgr']
 
     def __init__(self):
         self.address = None
@@ -73,4 +74,5 @@ class ClientConn:
 
     def disconnect(self):
         self.status = ClientStatus.DISCONNECTED
+
 

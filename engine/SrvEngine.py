@@ -7,12 +7,6 @@ import sys
 srv_inst = None
 
 
-def set_srv_instance(srv):
-    global srv_inst
-    srv_inst = srv
-    return srv_inst
-
-
 class Engine:
     def __init__(self, name: str, process_pool: int = None) -> None:
         self.exiting = False
