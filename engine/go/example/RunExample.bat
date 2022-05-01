@@ -1,0 +1,1 @@
+start "example" cmd /c "go run main.go & pause"
