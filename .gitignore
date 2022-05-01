@@ -2,5 +2,5 @@
 *.py[cod]
 venv/
 .idea/
-install/log/
+script/log/
 
