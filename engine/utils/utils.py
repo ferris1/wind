@@ -3,6 +3,39 @@ import logging
 import inspect
 import asyncio
 import functools
+import sys
+
+_int_to_bytes = int.to_bytes
+_bool_to_bytes = bool.to_bytes
+_int_from_bytes = int.from_bytes
+
+
+def int16_to_bytes(i):
+    return _int_to_bytes(i, length=2, byteorder='little', signed=True)
+
+
+def int32_to_bytes(i):
+    return _int_to_bytes(i, length=4, byteorder='little', signed=True)
+
+
+def uint16_to_bytes(i):
+    return _int_to_bytes(i, length=2, byteorder='little', signed=False)
+
+
+def uint32_to_bytes(i):
+    return _int_to_bytes(i, length=4, byteorder='little', signed=False)
+
+
+def bool_to_bytes(i):
+    return _bool_to_bytes(i, length=1, byteorder='little')
+
+
+def int_from_bytes(i):
+    return _int_from_bytes(i, byteorder='little', signed=True)
+
+
+def uint_from_bytes(i):
+    return _int_from_bytes(i, byteorder='little', signed=False)
 
 
 def ensure_future_pack(co, *args, **kwargs):
@@ -28,3 +61,28 @@ def load_all_handlers(hanglers_mod):
                 cmd_map[f.__name__[8:]] = cb
     logging.info(f'Loading finish with {len(cmd_map)} methods')
     return cmd_map
+
+
+def asyncio_ensure_future(co, *args, **kwargs):
+    return asyncio.ensure_future(co(*args, **kwargs))
+
+
+def check_async_cb(cb):
+    if asyncio.iscoroutinefunction(cb):
+        return functools.partial(asyncio_ensure_future, cb)
+    else:
+        return cb
+
+
+def init_asyncio_loop_policy():
+    # main asyncio loop
+    if sys.platform == 'win32':
+        # https://bugs.python.org/issue37373
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+    try:
+        import uvloop
+    except ImportError:
+        logging.error('uvloop is not available')
+    else:
+        asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())

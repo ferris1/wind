@@ -1,0 +1,6 @@
+redis-py-cluster==2.1.0
+pyzmq==19.0.2
+aiozmq==0.9.0
+aredis==1.1.8
+etcd3==0.12.0
+protobuf==3.7.1

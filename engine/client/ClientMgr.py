@@ -1,7 +1,7 @@
 from enum import IntEnum
 from engine.utils.Singleton import Singleton
 import logging
-
+from engine.network.ZmqNetwork import ZmqNetwork
 
 class ClientMgr(Singleton):
 
@@ -12,8 +12,10 @@ class ClientMgr(Singleton):
         self.disconnet_cb = None
         self.data_cb = None
 
-    def init(self, connect_cb, disconnet_cb, data_cb):
+    async def init(self,ip, port):
         logging.info("ClientMgr init ")
+        net = ZmqNetwork()
+        await net.start_net_thread(ip, port, self.on_net_connect, self.on_net_disconnect, self.on_net_data)
 
     def on_net_connect(self, peer_id, address, port):
         conn = self.create_conn(peer_id,address,port)

@@ -12,7 +12,7 @@ class GameSrv(Engine):
 
     async def init(self):
         await super().init()
-        ClientMgr().init(None, None, None)
+        await ClientMgr().init(self.ip, self.port)
 
     async def register(self):
         await super(GameSrv, self).register()

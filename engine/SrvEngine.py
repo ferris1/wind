@@ -3,8 +3,12 @@ import asyncio
 import logging
 from engine.logger.LogModule import init_log
 import sys
+from engine.utils.utils import init_asyncio_loop_policy
+
 # engine 实例
 srv_inst = None
+
+# python 3.9.12
 
 
 class Engine:
@@ -19,6 +23,7 @@ class Engine:
 
         self.request_que = asyncio.Queue()
         self.cmd_map = {}
+        init_asyncio_loop_policy()
         self.loop = asyncio.get_event_loop()
 
         # 以下为各个插件
