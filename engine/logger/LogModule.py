@@ -12,7 +12,7 @@ def set_log(name="test", to_console=True, to_file=True, file_name=""):
     Path(log_dir).mkdir(parents=True, exist_ok=True)
 
     log_level = logging.INFO
-    format_str = f'[wind][%(asctime)s][{name}][%(levelname)s][%(filename)s:%(lineno)d %(funcName)s]: %(message)s'
+    format_str = f'[wind][{name}][%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d %(funcName)s]: %(message)s'
     formatter = logging.Formatter(format_str)
     logging.getLogger().handlers.clear()
 

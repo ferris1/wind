@@ -43,11 +43,13 @@ func NewNetServer() *NetServer {
 }
 
 //export StartNetThread
-func StartNetThread(netPyAddr *C.char, ip *C.char, port int)  {
+func StartNetThread(netPyAddr *C.char, ip *C.char,name *C.char, port int)  {
 	s := NewNetServer()
 	s.netPyAddr = C.GoString(netPyAddr)
 	s.IP = C.GoString(ip)
 	s.Port = port
+	s.Name = C.GoString(name)
+	s.Init()
 	s.Start()
 }
 
@@ -60,7 +62,7 @@ func (s *NetServer) Start() {
 func (s *NetServer) PyNetStart() {
 	conn, err := net.Dial("tcp", s.netPyAddr)
 	if err != nil {
-		fmt.Println("client start err, exit!", err)
+		NetLog.Fatal("client start err, exit!", err)
 		return
 	}
 	pyConn := NewConnection(s, conn, PyConnId, s.MsgHandler,true)
@@ -68,12 +70,11 @@ func (s *NetServer) PyNetStart() {
 	for {
 		err = pyConn.SendPyMsg(uint32(CmdInit), 0, 0, []byte("hello"))
 		if err != nil {
-			fmt.Println("write error err ", err)
 			continue
 		}
 		pymsg := pyConn.ReadFromPy()
 		if pymsg != nil && ServerCmdEnum(pymsg.GetCmdID()) == CmdInit {
-			fmt.Println("PyNetStart finish")
+			NetLog.Info("PyNetStart finish")
 			break
 		}
 	}
@@ -83,21 +84,20 @@ func (s *NetServer) PyNetStart() {
 func (s *NetServer) TcpStart() {
 	addr, err := net.ResolveTCPAddr(s.IPVersion, fmt.Sprintf("%s:%d", s.IP, s.Port))
 	if err != nil {
-		fmt.Println("resolve tcp addr err: ", err)
+		NetLog.Erorr("resolve tcp addr err: ", err)
 		return
 	}
 	listener, err := net.ListenTCP(s.IPVersion, addr)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("start Wnet server  ", s.Name, " succ, now listenning...")
 	for {
 		conn, err := listener.AcceptTCP()
 		if err != nil {
-			fmt.Println("Accept err ", err)
+			NetLog.Erorr("Accept err ", err)
 			continue
 		}
-		fmt.Println("Get conn remote addr = ", conn.RemoteAddr().String())
+		NetLog.Info("Get conn remote addr = ", conn.RemoteAddr().String())
 		if s.ConnMgr.Len() >= MaxConn {
 			_ = conn.Close()
 			continue
@@ -109,12 +109,17 @@ func (s *NetServer) TcpStart() {
 }
 
 
+func (s *NetServer) Init() {
+	NetLog = NewLogger()
+	_ = NetLog.Init(s.Name)
+}
+
 func (s *NetServer) Stop() {
-	fmt.Println("[STOP] Wnet server , name ", s.Name)
 	s.ConnMgr.ClearConn()
 }
 
 func (s *NetServer) Serve() {
+	s.Init()
 	s.Start()
 	select {}
 }

@@ -1,7 +1,6 @@
 package wnet
 
 import (
-	"fmt"
 	"net"
 	"strconv"
 )
@@ -46,10 +45,9 @@ func (mh *MsgHandle) StartNetWorker()  {
 }
 
 func (mh *MsgHandle) DoMsgHandler(request IRequest) {
-	fmt.Println("DoMsgHandler cmd.id: ",request.GetCmdID(),"msg.id: ",request.GetMsgID(), "data: ", string(request.GetData()))
 	pyConn,err := mh.Server.GetConnMgr().Get(PyConnId)
-	if err!=nil {
-		fmt.Println("no py conn")
+	if err != nil {
+		NetLog.Erorr("no py conn")
 		return
 	}
 	conn := request.GetConnection()
@@ -72,7 +70,6 @@ func (mh *MsgHandle) DoMsgHandler(request IRequest) {
 }
 
 func (mh *MsgHandle) DoPyMsgHandler(request IRequest) {
-	fmt.Println("DoPyMsgHandler cmd.id: ",request.GetCmdID(),"msg.id: ",request.GetMsgID(), "data: ", string(request.GetData()))
 	//pyConn := request.GetConnection()
 	switch ServerCmdEnum(request.GetCmdID()) {
 	case CmdExit:
@@ -90,7 +87,7 @@ func (mh *MsgHandle) DoPyMsgHandler(request IRequest) {
 			_ = conn.SendMsg(request.GetMsgID(), request.GetData())
 		}
 	default:
-		fmt.Println("no py cmd")
+		NetLog.Erorr("no py cmd")
 	}
 }
 

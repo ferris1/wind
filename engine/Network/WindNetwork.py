@@ -33,10 +33,10 @@ class WindNetwork:
         dll_file = r'../builds/wnet.dll'
 
         self.network_dll = ctypes.WinDLL(dll_file)
-        self.network_dll.StartNetThread.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int]
+        self.network_dll.StartNetThread.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int]
         self.network_dll.StartNetThread.restype = ctypes.c_void_p
 
-        self.network_dll.StartNetThread(net_thread_address.encode(), ip.encode(), port)
+        self.network_dll.StartNetThread(net_thread_address.encode(), ip.encode(), SrvEngine.srv_inst.name.encode(), port)
 
     def net_send_data(self, peer_id, data):
         if not self.net_transport:

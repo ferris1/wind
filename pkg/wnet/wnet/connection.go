@@ -3,7 +3,6 @@ package wnet
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"net"
 	"sync"
@@ -40,7 +39,6 @@ type Connection struct {
 }
 
 func NewConnection(server INetServer, conn net.Conn, peerID uint32, msgHandler IMsgHandle, isPyConn bool) IConnection {
-	//初始化Conn属性
 	c := &Connection{
 		Server:      server,
 		Conn:        conn,
@@ -55,8 +53,7 @@ func NewConnection(server INetServer, conn net.Conn, peerID uint32, msgHandler I
 }
 
 func (c *Connection) StartReader() {
-	fmt.Println("[Reader Goroutine is running]")
-	defer fmt.Println(c.RemoteAddr().String(), "[conn Reader exit!]")
+
 	defer c.Stop()
 
 	for {
@@ -66,19 +63,19 @@ func (c *Connection) StartReader() {
 		default:
 			headData := make([]byte, c.Server.Packet().GetHeadLen())
 			if _, err := io.ReadFull(c.Conn, headData); err != nil {
-				fmt.Println("read msg head error ", err)
+				NetLog.Erorr("read client msg head error: ", err)
 				return
 			}
 			msg, err := c.Server.Packet().Unpack(headData)
 			if err != nil {
-				fmt.Println("unpack error ", err)
+				NetLog.Erorr("unpack error ", err)
 				return
 			}
 			var data []byte
 			if msg.GetDataLen() > 0 {
 				data = make([]byte, msg.GetDataLen())
 				if _, err := io.ReadFull(c.Conn, data); err != nil {
-					fmt.Println("read msg data error ", err)
+					NetLog.Erorr("read msg data error ", err)
 					return
 				}
 			}
@@ -93,10 +90,8 @@ func (c *Connection) StartReader() {
 }
 
 func (c *Connection) StartPyReader() {
-	fmt.Println("[PyReader Goroutine is running]")
-	defer fmt.Println(c.RemoteAddr().String(), "[conn PyReader exit!]")
-	defer c.Stop()
 
+	defer c.Stop()
 	for {
 		select {
 		case <-c.ctx.Done():
@@ -104,19 +99,19 @@ func (c *Connection) StartPyReader() {
 		default:
 			headData := make([]byte, c.Server.Packet().GetPyHeadLen())
 			if _, err := io.ReadFull(c.Conn, headData); err != nil {
-				fmt.Println("read msg head error ", err)
+				NetLog.Erorr("read msg head error ", err)
 				return
 			}
 			msg, err := c.Server.Packet().UnpackPy(headData)
 			if err != nil {
-				fmt.Println("unpack error ", err)
+				NetLog.Erorr("unpack error: ", err)
 				return
 			}
 			var data []byte
 			if msg.GetDataLen() > 0 {
 				data = make([]byte, msg.GetDataLen())
 				if _, err := io.ReadFull(c.Conn, data); err != nil {
-					fmt.Println("read msg data error ", err)
+					NetLog.Erorr("read msg data error ", err)
 					return
 				}
 			}
@@ -140,7 +135,7 @@ func (c *Connection) SendMsg(msgID uint32, data []byte) error {
 	dp := c.Server.Packet()
 	msg, err := dp.Pack(NewMessage(uint32(CmdPacket), msgID, data))
 	if err != nil {
-		fmt.Println("Pack error msg MsgID = ", msgID)
+		NetLog.Erorr("Pack error msg MsgID = ", msgID)
 		return errors.New("Pack error msg ")
 	}
 	_, err = c.Conn.Write(msg)
@@ -157,7 +152,7 @@ func (c *Connection) SendPyMsg(cmdID uint32, PeerId uint32, msgID uint32, data [
 	dp := c.Server.Packet()
 	msg, err := dp.PackPy(NewPyMessage(cmdID, PeerId, msgID, data))
 	if err != nil {
-		fmt.Println("Pack error msg MsgID = ", msgID)
+		NetLog.Erorr("Pack error msg MsgID = ", msgID)
 		return errors.New("Pack error msg ")
 	}
 	_, err = c.Conn.Write(msg)
@@ -167,19 +162,19 @@ func (c *Connection) SendPyMsg(cmdID uint32, PeerId uint32, msgID uint32, data [
 func (c *Connection) ReadFromPy() IMessage {
 	headData := make([]byte, c.Server.Packet().GetPyHeadLen())
 	if _, err := io.ReadFull(c.Conn, headData); err != nil {
-		fmt.Println("read msg head error ", err)
+		NetLog.Erorr("read msg head error ", err)
 		return nil
 	}
 	msg, err := c.Server.Packet().UnpackPy(headData)
 	if err != nil {
-		fmt.Println("unpack error ", err)
+		NetLog.Erorr("unpack error ", err)
 		return nil
 	}
 	var data []byte
 	if msg.GetDataLen() > 0 {
 		data = make([]byte, msg.GetDataLen())
 		if _, err := io.ReadFull(c.Conn, data); err != nil {
-			fmt.Println("read msg data error ", err)
+			NetLog.Erorr("read msg data error ", err)
 			return nil
 		}
 	}
@@ -252,7 +247,6 @@ func (c *Connection) finalizer() {
 	if c.isClosed == true {
 		return
 	}
-	fmt.Println("Conn Stop()...PeerID = ", c.PeerID)
 	_ = c.Conn.Close()
 	c.Server.GetConnMgr().Remove(c)
 	close(c.msgBuffChan)
