@@ -3,10 +3,7 @@ import asyncio
 import logging
 from engine.logger.LogModule import init_log
 import sys
-from engine.utils.utils import init_asyncio_loop_policy
-
-# engine 实例
-srv_inst = None
+from engine.utils.Utils import init_asyncio_loop_policy
 
 # python 3.9.12
 
@@ -70,3 +67,6 @@ class Engine:
     def register_cmd(self, cmd_dct):
         self.cmd_map.update(cmd_dct)
 
+
+# engine 实例
+srv_inst: Engine = None

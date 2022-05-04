@@ -2,12 +2,9 @@ package wnet
 
 import (
 	"C"
-	"context"
-
 	"fmt"
+	"io"
 	"net"
-
-	zmq "github.com/go-zeromq/zmq4"
 )
 
 var (
@@ -34,10 +31,10 @@ type NetServer struct {
 	MsgHandler    IMsgHandle
 	ConnMgr       IConnManager
 	Pack          IMsgPack
-	ZmqFromPy     zmq.Socket
-	ZmqToPy       zmq.Socket
-	ZmqFromPyAddr string
-	ZmqToPyAddr   string
+	NetFromPyAddr string
+	NetToPyAddr   string
+
+	FromPyConn 			net.Conn
 }
 
 func NewNetServer() *NetServer {
@@ -54,78 +51,101 @@ func NewNetServer() *NetServer {
 }
 
 //export StartNetThread
-func StartNetThread(zmqFromPyAddr *C.char, zmqToPyAddr *C.char, ip *C.char, port int)  {
+func StartNetThread(netFromPyAddr *C.char, netToPyAddr *C.char, ip *C.char, port int)  {
 	s := NewNetServer()
-	s.ZmqFromPyAddr = C.GoString(zmqFromPyAddr)
-	s.ZmqToPyAddr = C.GoString(zmqToPyAddr)
+	s.NetFromPyAddr = C.GoString(netFromPyAddr)
+	s.NetToPyAddr = C.GoString(netToPyAddr)
 	s.IP = C.GoString(ip)
 	s.Port = port
 	s.Start()
 }
 
-
 func (s *NetServer) Start() {
-	ctx,_ := context.WithCancel(context.Background())
-	s.ZmqStart(ctx)
-	s.TcpStart(ctx)
+	go s.PyNetStart()
+	go s.TcpStart()
 }
 
-
-func (s *NetServer) ZmqStart(ctx context.Context) {
-	s.ZmqFromPy = zmq.NewPull(ctx)
-	s.ZmqFromPy.SetOption(zmq.OptionHWM, 0)
-	fmt.Println(" start listen:", s.ZmqFromPyAddr)
-	s.ZmqFromPy.Listen(s.ZmqFromPyAddr)
-	fmt.Println("listen finish ")
-
-
-	s.ZmqToPy = zmq.NewPush(ctx)
-	s.ZmqToPy.SetOption(zmq.OptionHWM, 0)
-	fmt.Println("start connect:", s.ZmqToPyAddr)
-	s.ZmqToPy.Dial(s.ZmqToPyAddr)
-	fmt.Println("connect finish:", s.ZmqToPyAddr)
-}
-
-
-func (s *NetServer) TcpStart(ctx context.Context) {
-	go func() {
-		s.MsgHandler.StartWorkerPool()
-		addr, err := net.ResolveTCPAddr(s.IPVersion, fmt.Sprintf("%s:%d", s.IP, s.Port))
+func (s *NetServer) PyNetStart() {
+	conn, err := net.Dial("tcp", "127.0.0.1:60010")
+	if err != nil {
+		fmt.Println("client start err, exit!", err)
+		return
+	}
+	s.FromPyConn = conn
+	for {
+		//发封包message消息
+		dp := NewMsgPack()
+		msg, _ := dp.PackPy(NewPyMessage(0, uint32(CmdInit),[]byte("hello")))
+		_, err = s.FromPyConn.Write(msg)
 		if err != nil {
-			fmt.Println("resolve tcp addr err: ", err)
-			return
+			fmt.Println("write error err ", err)
+			continue
 		}
-		listener, err := net.ListenTCP(s.IPVersion, addr)
-		if err != nil {
-			panic(err)
+		pymsg := s.ReadFromPy()
+		if pymsg != nil && ServerCmdEnum(pymsg.GetCmdID()) == CmdInit {
+			fmt.Println("PyNetStart finish")
+			break
 		}
-		fmt.Println("start Wnet server  ", s.Name, " succ, now listenning...")
-		var cID uint32
-		cID = 0
-
-		for {
-			conn, err := listener.AcceptTCP()
-			if err != nil {
-				fmt.Println("Accept err ", err)
-				continue
-			}
-			fmt.Println("Get conn remote addr = ", conn.RemoteAddr().String())
-
-			if s.ConnMgr.Len() >= MaxConn {
-				_ = conn.Close()
-				continue
-			}
-
-			dealConn := NewConnection(s, conn, cID, s.MsgHandler)
-			cID++
-
-			go dealConn.Start()
-		}
-	}()
+	}
 }
+
+func (s *NetServer) ReadFromPy() IMessage {
+	headData := make([]byte, s.Packet().GetPyHeadLen())
+	if _, err := io.ReadFull(s.FromPyConn, headData); err != nil {
+		fmt.Println("read msg head error ", err)
+		return nil
+	}
+	msg, err := s.Packet().UnpackPy(headData)
+	if err != nil {
+		fmt.Println("unpack error ", err)
+		return nil
+	}
+	var data []byte
+	if msg.GetDataLen() > 0 {
+		data = make([]byte, msg.GetDataLen())
+		if _, err := io.ReadFull(s.FromPyConn, data); err != nil {
+			fmt.Println("read msg data error ", err)
+			return nil
+		}
+	}
+	msg.SetData(data)
+	return msg
+}
+
+func (s *NetServer) TcpStart() {
+	s.MsgHandler.StartWorkerPool()
+	addr, err := net.ResolveTCPAddr(s.IPVersion, fmt.Sprintf("%s:%d", s.IP, s.Port))
+	if err != nil {
+		fmt.Println("resolve tcp addr err: ", err)
+		return
+	}
+	listener, err := net.ListenTCP(s.IPVersion, addr)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("start Wnet server  ", s.Name, " succ, now listenning...")
+	var cID uint32
+	cID = 0
+	for {
+		conn, err := listener.AcceptTCP()
+		if err != nil {
+			fmt.Println("Accept err ", err)
+			continue
+		}
+		fmt.Println("Get conn remote addr = ", conn.RemoteAddr().String())
+		if s.ConnMgr.Len() >= MaxConn {
+			_ = conn.Close()
+			continue
+		}
+		dealConn := NewConnection(s, conn, cID, s.MsgHandler)
+		cID++
+		go dealConn.Start()
+	}
+}
+
 
 func (s *NetServer) Stop() {
-	fmt.Println("[STOP] Zinx server , name ", s.Name)
+	fmt.Println("[STOP] Wnet server , name ", s.Name)
 	s.ConnMgr.ClearConn()
 }
 

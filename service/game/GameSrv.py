@@ -1,7 +1,7 @@
 import logging
 from engine.SrvEngine import Engine
 from engine import SrvEngine
-from engine.utils.utils import load_all_handlers
+from engine.utils.Utils import load_all_handlers
 from service.game.modules.game_player_module import GamePlayerModules
 from engine.client.ClientMgr import ClientMgr
 
