@@ -2,37 +2,38 @@ from enum import IntEnum
 from engine.utils.Singleton import Singleton
 import logging
 from engine.network.WindNetwork import WindNetwork
+from engine import SrvEngine
+import asyncio
 
 
 class ClientMgr(Singleton):
-
     def __init__(self):
         self.peer_to_client = {}
         self.connect_count = 0
-        self.connect_cb = None
-        self.disconnet_cb = None
-        self.data_cb = None
+        self.wind_net: WindNetwork = None
 
     async def init(self, ip, port):
         logging.info("ClientMgr init ")
-        net = WindNetwork()
-        await net.start_net_thread(ip, port, self.on_net_connect, self.on_net_disconnect, self.on_net_data)
+        self.wind_net = WindNetwork()
+        await self.wind_net.start_net_thread(ip, port, self.on_net_connect, self.on_net_disconnect, self.on_net_data)
 
     def on_net_connect(self, peer_id, address, port):
-        conn = self.create_conn(peer_id,address,port)
+        logging.info(f"on_net_connect.peer_id:{peer_id},address:{address}, port:{port}")
+        conn = self.create_conn(peer_id, address, port)
         self.peer_to_client[peer_id] = conn
         self.connect_count += 1
-        if self.connect_cb:
-            self.connect_cb(peer_id)
 
     def on_net_disconnect(self, peer_id):
-        self.peer_to_client.pop(peer_id,None)
+        logging.info(f"on_net_disconnect.peer_id:{peer_id}")
+        self.peer_to_client.pop(peer_id, None)
         self.connect_count -= 1
-        if self.disconnet_cb:
-            self.disconnet_cb(peer_id)
 
     def on_net_data(self, peer_id, proto_id, proto_data_len, proto_data):
-        pass
+        logging.info(f"on_net_data.peer_id:{peer_id},proto_id:{proto_id}, proto_data_len:{proto_data_len}")
+        client = self.get_client_conn_by_peer(peer_id)
+        if client:
+            request = proto_data.decode("utf-8")
+            asyncio.ensure_future(SrvEngine.srv_inst.on_client_request(client, request, request))
 
     def create_conn(self, peer_id, address, port):
         conn = ClientConn()
@@ -47,14 +48,14 @@ class ClientMgr(Singleton):
     def deal_command(self):
         pass
 
-    # 主动断开
     def disconnect_client(self, conn):
         pass
 
 
 class ClientStatus(IntEnum):
-    CONNECTED = 0
-    DISCONNECTED = 1
+    NONE = 0
+    CONNECTED = 1
+    DISCONNECTED = 2
 
 
 class ClientConn:
@@ -73,7 +74,7 @@ class ClientConn:
         self.srv = None
 
     def send_packet(self, pck):
-        pass
+        ClientMgr().wind_net.net_send_data(self.peer_id, pck)
 
     def disconnect(self):
         self.status = ClientStatus.DISCONNECTED

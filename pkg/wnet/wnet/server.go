@@ -3,15 +3,7 @@ package wnet
 import (
 	"C"
 	"fmt"
-	"io"
 	"net"
-)
-
-var (
-	MaxConn int32 = 50000
-	MaxPacketSize uint32 = 1024*1024*2
-	WorkerPoolSize int32 = 1
-	MaxWorkerTaskLen int32 = 10000
 )
 
 //定义服务接口
@@ -31,10 +23,8 @@ type NetServer struct {
 	MsgHandler    IMsgHandle
 	ConnMgr       IConnManager
 	Pack          IMsgPack
-	NetFromPyAddr string
-	NetToPyAddr   string
-
-	FromPyConn 			net.Conn
+	netPyAddr string
+	PeerID        uint32
 }
 
 func NewNetServer() *NetServer {
@@ -46,15 +36,16 @@ func NewNetServer() *NetServer {
 		MsgHandler: NewMsgHandle(),
 		ConnMgr:    NewConnManager(),
 		Pack: 		NewMsgPack(),
+		PeerID:		PeerIDStart,
 	}
+	s.MsgHandler.SetServer(s)
 	return s
 }
 
 //export StartNetThread
-func StartNetThread(netFromPyAddr *C.char, netToPyAddr *C.char, ip *C.char, port int)  {
+func StartNetThread(netPyAddr *C.char, ip *C.char, port int)  {
 	s := NewNetServer()
-	s.NetFromPyAddr = C.GoString(netFromPyAddr)
-	s.NetToPyAddr = C.GoString(netToPyAddr)
+	s.netPyAddr = C.GoString(netPyAddr)
 	s.IP = C.GoString(ip)
 	s.Port = port
 	s.Start()
@@ -63,57 +54,33 @@ func StartNetThread(netFromPyAddr *C.char, netToPyAddr *C.char, ip *C.char, port
 func (s *NetServer) Start() {
 	go s.PyNetStart()
 	go s.TcpStart()
+	go s.MsgHandler.StartNetWorker()
 }
 
 func (s *NetServer) PyNetStart() {
-	conn, err := net.Dial("tcp", "127.0.0.1:60010")
+	conn, err := net.Dial("tcp", s.netPyAddr)
 	if err != nil {
 		fmt.Println("client start err, exit!", err)
 		return
 	}
-	s.FromPyConn = conn
+	pyConn := NewConnection(s, conn, PyConnId, s.MsgHandler,true)
+	// 初始化python和go的交互
 	for {
-		//发封包message消息
-		dp := NewMsgPack()
-		msg, _ := dp.PackPy(NewPyMessage(0, uint32(CmdInit),[]byte("hello")))
-		_, err = s.FromPyConn.Write(msg)
+		err = pyConn.SendPyMsg(uint32(CmdInit), 0, 0, []byte("hello"))
 		if err != nil {
 			fmt.Println("write error err ", err)
 			continue
 		}
-		pymsg := s.ReadFromPy()
+		pymsg := pyConn.ReadFromPy()
 		if pymsg != nil && ServerCmdEnum(pymsg.GetCmdID()) == CmdInit {
 			fmt.Println("PyNetStart finish")
 			break
 		}
 	}
-}
-
-func (s *NetServer) ReadFromPy() IMessage {
-	headData := make([]byte, s.Packet().GetPyHeadLen())
-	if _, err := io.ReadFull(s.FromPyConn, headData); err != nil {
-		fmt.Println("read msg head error ", err)
-		return nil
-	}
-	msg, err := s.Packet().UnpackPy(headData)
-	if err != nil {
-		fmt.Println("unpack error ", err)
-		return nil
-	}
-	var data []byte
-	if msg.GetDataLen() > 0 {
-		data = make([]byte, msg.GetDataLen())
-		if _, err := io.ReadFull(s.FromPyConn, data); err != nil {
-			fmt.Println("read msg data error ", err)
-			return nil
-		}
-	}
-	msg.SetData(data)
-	return msg
+	go pyConn.Start()
 }
 
 func (s *NetServer) TcpStart() {
-	s.MsgHandler.StartWorkerPool()
 	addr, err := net.ResolveTCPAddr(s.IPVersion, fmt.Sprintf("%s:%d", s.IP, s.Port))
 	if err != nil {
 		fmt.Println("resolve tcp addr err: ", err)
@@ -124,8 +91,6 @@ func (s *NetServer) TcpStart() {
 		panic(err)
 	}
 	fmt.Println("start Wnet server  ", s.Name, " succ, now listenning...")
-	var cID uint32
-	cID = 0
 	for {
 		conn, err := listener.AcceptTCP()
 		if err != nil {
@@ -137,8 +102,8 @@ func (s *NetServer) TcpStart() {
 			_ = conn.Close()
 			continue
 		}
-		dealConn := NewConnection(s, conn, cID, s.MsgHandler)
-		cID++
+		dealConn := NewConnection(s, conn, s.PeerID, s.MsgHandler, false)
+		s.PeerID++
 		go dealConn.Start()
 	}
 }

@@ -1,0 +1,1 @@
+start "client" cmd /c "go run client.go & pause"

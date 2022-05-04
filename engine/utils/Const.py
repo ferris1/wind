@@ -8,3 +8,6 @@ class ServerCmdEnum(IntEnum):
     CmdConnect = 2
     CmdDisconnect = 3
     CmdPacket = 4
+
+    CmdSend = 100
+    CmdExit = 101

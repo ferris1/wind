@@ -6,32 +6,11 @@ import functools
 import sys
 
 _int_to_bytes = int.to_bytes
-_bool_to_bytes = bool.to_bytes
 _int_from_bytes = int.from_bytes
-
-
-def int16_to_bytes(i):
-    return _int_to_bytes(i, length=2, byteorder='little', signed=True)
-
-
-def int32_to_bytes(i):
-    return _int_to_bytes(i, length=4, byteorder='little', signed=True)
-
-
-def uint16_to_bytes(i):
-    return _int_to_bytes(i, length=2, byteorder='little', signed=False)
 
 
 def uint32_to_bytes(i):
     return _int_to_bytes(i, length=4, byteorder='little', signed=False)
-
-
-def bool_to_bytes(i):
-    return _bool_to_bytes(i, length=1, byteorder='little')
-
-
-def int_from_bytes(i):
-    return _int_from_bytes(i, byteorder='little', signed=True)
 
 
 def uint_from_bytes(i):
@@ -53,13 +32,13 @@ def load_all_handlers(hanglers_mod):
                 f = getattr(m, k)
                 spec = inspect.getfullargspec(f)
                 if hanglers_mod == 'game.handlers':
-                    assert sorted(spec.args) == sorted(['player_id', 'request'])
+                    assert sorted(spec.args) == sorted(['client', 'request'])
                 cb = f
                 if asyncio.iscoroutinefunction(f):
                     cb = functools.partial(ensure_future_pack, cb)
                 assert (f.__name__[8:] not in cmd_map.keys())
                 cmd_map[f.__name__[8:]] = cb
-    logging.info(f'Loading finish with {len(cmd_map)} methods')
+    logging.info(f'Loading finish with {len(cmd_map)} methods, cmd_map:{cmd_map}')
     return cmd_map
 
 
@@ -75,11 +54,8 @@ def check_async_cb(cb):
 
 
 def init_asyncio_loop_policy():
-    # main asyncio loop
     if sys.platform == 'win32':
-        # https://bugs.python.org/issue37373
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
     try:
         import uvloop
     except ImportError:

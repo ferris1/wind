@@ -5,35 +5,37 @@ type IMessage interface {
 	GetMsgID() uint32
 	GetData() []byte
 	GetCmdID() uint32
-
+	GetPeerID() uint32
 
 	SetMsgID(uint32)
 	SetData([]byte)
 	SetDataLen(uint32)
 }
 
-
 type Message struct {
 	DataLen uint32
-	ID      uint32
+	MsgID   uint32
 	Data    []byte
-	CmdId 	uint32
+	CmdId   uint32
+	PeerId  uint32
 }
 
-func NewMessage(ID uint32, data []byte) IMessage {
+func NewMessage(cmdId uint32,ID uint32, data []byte) IMessage {
 	return &Message{
 		DataLen: uint32(len(data)),
-		ID:      ID,
+		MsgID:   ID,
 		Data:    data,
+		CmdId:   cmdId,
 	}
 }
 
-func NewPyMessage(ID uint32, CmdId uint32, data []byte) IMessage {
+func NewPyMessage(CmdId uint32,PeerId uint32,ID uint32, data []byte) IMessage {
 	return &Message{
-		DataLen: 	uint32(len(data)),
-		ID:      	ID,
-		CmdId: 		CmdId,
-		Data:    	data,
+		DataLen: uint32(len(data)),
+		MsgID:   ID,
+		CmdId:   CmdId,
+		Data:    data,
+		PeerId: PeerId,
 	}
 }
 
@@ -42,11 +44,15 @@ func (msg *Message) GetDataLen() uint32 {
 }
 
 func (msg *Message) GetMsgID() uint32 {
-	return msg.ID
+	return msg.MsgID
 }
 
 func (msg *Message) GetCmdID() uint32 {
 	return msg.CmdId
+}
+
+func (msg *Message) GetPeerID() uint32 {
+	return msg.PeerId
 }
 
 func (msg *Message) GetData() []byte {
@@ -58,7 +64,7 @@ func (msg *Message) SetDataLen(len uint32) {
 }
 
 func (msg *Message) SetMsgID(msgID uint32) {
-	msg.ID = msgID
+	msg.MsgID = msgID
 }
 
 func (msg *Message) SetData(data []byte) {
@@ -69,5 +75,8 @@ func (msg *Message) SetCmdID(CmdId uint32) {
 	msg.CmdId = CmdId
 }
 
+func (msg *Message) SetPeerID(peerId uint32) {
+	msg.PeerId = peerId
+}
 
 

@@ -7,31 +7,31 @@ import (
 	"io"
 	"net"
 	"sync"
-	"time"
 )
-
 
 type IConnection interface {
 	Start()
 	Stop()
 	Context() context.Context
 
-	GetTCPConnection() *net.TCPConn
-	GetConnID() uint32
+	GetTCPConnection() net.Conn
+	GetPeerID() uint32
+	GetIsPyConn() bool
 	RemoteAddr() net.Addr
-
 	SendMsg(msgID uint32, data []byte) error
-	SendBuffMsg(msgID uint32, data []byte) error
+	SendPyMsg(cmdID uint32,peerId uint32, msgID uint32, data []byte) error
+	ReadFromPy() IMessage
 }
 
 
 type Connection struct {
-	Server 			INetServer
-	Conn 			*net.TCPConn
-	ConnID 			uint32
-	MsgHandler 		IMsgHandle
-	ctx    context.Context
-	cancel context.CancelFunc
+	Server      INetServer
+	Conn        net.Conn
+	PeerID      uint32
+	MsgHandler  IMsgHandle
+	IsPyConn    bool
+	ctx         context.Context
+	cancel      context.CancelFunc
 	msgBuffChan chan []byte
 
 	sync.RWMutex
@@ -39,40 +39,19 @@ type Connection struct {
 	isClosed bool
 }
 
-func NewConnection(server INetServer, conn *net.TCPConn, connID uint32, msgHandler IMsgHandle) IConnection {
+func NewConnection(server INetServer, conn net.Conn, peerID uint32, msgHandler IMsgHandle, isPyConn bool) IConnection {
 	//初始化Conn属性
 	c := &Connection{
-		Server:   	server,
+		Server:      server,
 		Conn:        conn,
-		ConnID:      connID,
+		PeerID:      peerID,
 		isClosed:    false,
 		MsgHandler:  msgHandler,
 		msgBuffChan: make(chan []byte, 1024),
+		IsPyConn:    isPyConn,
 	}
-
+	c.Server.GetConnMgr().Add(c)
 	return c
-}
-
-func (c *Connection) StartWriter() {
-	fmt.Println("[Writer Goroutine is running]")
-	defer fmt.Println(c.RemoteAddr().String(), "[conn Writer exit!]")
-
-	for {
-		select {
-		case data, ok := <-c.msgBuffChan:
-			if ok {
-				if _, err := c.Conn.Write(data); err != nil {
-					fmt.Println("Send Buff Data error:, ", err, " Conn Writer exit")
-					return
-				}
-			} else {
-				fmt.Println("msgBuffChan is Closed")
-				break
-			}
-		case <-c.ctx.Done():
-			return
-		}
-	}
 }
 
 func (c *Connection) StartReader() {
@@ -113,31 +92,42 @@ func (c *Connection) StartReader() {
 	}
 }
 
-func (c *Connection) Start() {
-	c.ctx, c.cancel = context.WithCancel(context.Background())
-	go c.StartReader()
-	go c.StartWriter()
-	select {
-	case <-c.ctx.Done():
-		c.finalizer()
-		return
+func (c *Connection) StartPyReader() {
+	fmt.Println("[PyReader Goroutine is running]")
+	defer fmt.Println(c.RemoteAddr().String(), "[conn PyReader exit!]")
+	defer c.Stop()
+
+	for {
+		select {
+		case <-c.ctx.Done():
+			return
+		default:
+			headData := make([]byte, c.Server.Packet().GetPyHeadLen())
+			if _, err := io.ReadFull(c.Conn, headData); err != nil {
+				fmt.Println("read msg head error ", err)
+				return
+			}
+			msg, err := c.Server.Packet().UnpackPy(headData)
+			if err != nil {
+				fmt.Println("unpack error ", err)
+				return
+			}
+			var data []byte
+			if msg.GetDataLen() > 0 {
+				data = make([]byte, msg.GetDataLen())
+				if _, err := io.ReadFull(c.Conn, data); err != nil {
+					fmt.Println("read msg data error ", err)
+					return
+				}
+			}
+			msg.SetData(data)
+			req := Request{
+				conn: c,
+				msg:  msg,
+			}
+			c.MsgHandler.SendMsgToTaskQueue(&req)
+		}
 	}
-}
-
-func (c *Connection) Stop() {
-	c.cancel()
-}
-
-func (c *Connection) GetTCPConnection() *net.TCPConn {
-	return c.Conn
-}
-
-func (c *Connection) GetConnID() uint32 {
-	return c.ConnID
-}
-
-func (c *Connection) RemoteAddr() net.Addr {
-	return c.Conn.RemoteAddr()
 }
 
 func (c *Connection) SendMsg(msgID uint32, data []byte) error {
@@ -148,39 +138,108 @@ func (c *Connection) SendMsg(msgID uint32, data []byte) error {
 	}
 
 	dp := c.Server.Packet()
-	msg, err := dp.Pack(NewMessage(msgID, data))
+	msg, err := dp.Pack(NewMessage(uint32(CmdPacket), msgID, data))
 	if err != nil {
-		fmt.Println("Pack error msg ID = ", msgID)
+		fmt.Println("Pack error msg MsgID = ", msgID)
 		return errors.New("Pack error msg ")
 	}
 	_, err = c.Conn.Write(msg)
 	return err
 }
 
-func (c *Connection) SendBuffMsg(msgID uint32, data []byte) error {
+func (c *Connection) SendPyMsg(cmdID uint32, PeerId uint32, msgID uint32, data []byte) error {
 	c.RLock()
 	defer c.RUnlock()
-	idleTimeout := time.NewTimer(5 * time.Millisecond)
-	defer idleTimeout.Stop()
-
 	if c.isClosed == true {
-		return errors.New("Connection closed when send buff msg")
+		return errors.New("connection closed when send msg")
 	}
 
 	dp := c.Server.Packet()
-	msg, err := dp.Pack(NewMessage(msgID, data))
+	msg, err := dp.PackPy(NewPyMessage(cmdID, PeerId, msgID, data))
 	if err != nil {
-		fmt.Println("Pack error msg ID = ", msgID)
+		fmt.Println("Pack error msg MsgID = ", msgID)
 		return errors.New("Pack error msg ")
 	}
-	select {
-	case <-idleTimeout.C:
-		return errors.New("send buff msg timeout")
-	case c.msgBuffChan <- msg:
+	_, err = c.Conn.Write(msg)
+	return err
+}
+
+func (c *Connection) ReadFromPy() IMessage {
+	headData := make([]byte, c.Server.Packet().GetPyHeadLen())
+	if _, err := io.ReadFull(c.Conn, headData); err != nil {
+		fmt.Println("read msg head error ", err)
 		return nil
 	}
+	msg, err := c.Server.Packet().UnpackPy(headData)
+	if err != nil {
+		fmt.Println("unpack error ", err)
+		return nil
+	}
+	var data []byte
+	if msg.GetDataLen() > 0 {
+		data = make([]byte, msg.GetDataLen())
+		if _, err := io.ReadFull(c.Conn, data); err != nil {
+			fmt.Println("read msg data error ", err)
+			return nil
+		}
+	}
+	msg.SetData(data)
+	return msg
+}
 
-	return nil
+func (c *Connection) Start() {
+	c.ctx, c.cancel = context.WithCancel(context.Background())
+	if c.IsPyConn {
+		go c.StartPyReader()
+	} else{
+		go c.StartReader()
+		c.SendConnectToPy()
+	}
+	select {
+	case <-c.ctx.Done():
+		c.finalizer()
+		return
+	}
+}
+
+func (c *Connection) SendConnectToPy() {
+	msg:= NewMessage(uint32(CmdConnect),0,[]byte(""))
+	req := Request{
+		conn: c,
+		msg:  msg,
+	}
+	c.MsgHandler.SendMsgToTaskQueue(&req)
+}
+
+func (c *Connection) SendDisconnectToPy() {
+	msg:= NewMessage(uint32(CmdDisconnect),0,[]byte(""))
+	req := Request{
+		conn: c,
+		msg:  msg,
+	}
+	c.MsgHandler.SendMsgToTaskQueue(&req)
+}
+
+
+func (c *Connection) Stop() {
+	c.SendDisconnectToPy()
+	c.cancel()
+}
+
+func (c *Connection) GetTCPConnection() net.Conn {
+	return c.Conn
+}
+
+func (c *Connection) GetPeerID() uint32 {
+	return c.PeerID
+}
+
+func (c *Connection) GetIsPyConn() bool {
+	return c.IsPyConn
+}
+
+func (c *Connection) RemoteAddr() net.Addr {
+	return c.Conn.RemoteAddr()
 }
 
 func (c *Connection) Context() context.Context {
@@ -188,13 +247,12 @@ func (c *Connection) Context() context.Context {
 }
 
 func (c *Connection) finalizer() {
-
 	c.Lock()
 	defer c.Unlock()
 	if c.isClosed == true {
 		return
 	}
-	fmt.Println("Conn Stop()...ConnID = ", c.ConnID)
+	fmt.Println("Conn Stop()...PeerID = ", c.PeerID)
 	_ = c.Conn.Close()
 	c.Server.GetConnMgr().Remove(c)
 	close(c.msgBuffChan)

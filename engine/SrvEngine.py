@@ -67,6 +67,20 @@ class Engine:
     def register_cmd(self, cmd_dct):
         self.cmd_map.update(cmd_dct)
 
+    def get_cmd(self, name):
+        logging.info(f"name:{name}, cmd_map:{self.cmd_map}")
+        return self.cmd_map.get(name)
+
+    async def on_client_request(self, client, cmd, request):
+        func = self.get_cmd(cmd)
+        if func:
+            if asyncio.iscoroutinefunction(func):
+                await func(client=client, request=request)
+            else:
+                func(client=client, request=request)
+        else:
+            logging.error(f"no rpc func:{cmd}")
+
 
 # engine 实例
 srv_inst: Engine = None

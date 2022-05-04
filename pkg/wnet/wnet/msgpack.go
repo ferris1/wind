@@ -16,9 +16,8 @@ type IMsgPack interface {
 	UnpackPy([]byte) (IMessage, error)
 }
 
-
 var defaultHeaderLen uint32 = 8
-var defaultPyHeaderLen uint32 = 12
+var defaultPyHeaderLen uint32 = 16
 
 type MsgPack struct{}
 
@@ -56,7 +55,7 @@ func (dp *MsgPack) Unpack(binaryData []byte) (IMessage, error) {
 	dataBuff := bytes.NewReader(binaryData)
 	msg := &Message{}
 
-	if err := binary.Read(dataBuff, binary.LittleEndian, &msg.ID); err != nil {
+	if err := binary.Read(dataBuff, binary.LittleEndian, &msg.MsgID); err != nil {
 		return nil, err
 	}
 	if err := binary.Read(dataBuff, binary.LittleEndian, &msg.DataLen); err != nil {
@@ -76,7 +75,9 @@ func (dp *MsgPack) PackPy(msg IMessage) ([]byte, error) {
 	if err := binary.Write(dataBuff, binary.LittleEndian, msg.GetCmdID()); err != nil {
 		return nil, err
 	}
-
+	if err := binary.Write(dataBuff, binary.LittleEndian, msg.GetPeerID()); err != nil {
+		return nil, err
+	}
 	if err := binary.Write(dataBuff, binary.LittleEndian, msg.GetMsgID()); err != nil {
 		return nil, err
 	}
@@ -97,7 +98,10 @@ func (dp *MsgPack) UnpackPy(binaryData []byte) (IMessage, error) {
 	if err := binary.Read(dataBuff, binary.LittleEndian, &msg.CmdId); err != nil {
 		return nil, err
 	}
-	if err := binary.Read(dataBuff, binary.LittleEndian, &msg.ID); err != nil {
+	if err := binary.Read(dataBuff, binary.LittleEndian, &msg.PeerId); err != nil {
+		return nil, err
+	}
+	if err := binary.Read(dataBuff, binary.LittleEndian, &msg.MsgID); err != nil {
 		return nil, err
 	}
 	if err := binary.Read(dataBuff, binary.LittleEndian, &msg.DataLen); err != nil {

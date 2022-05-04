@@ -2,8 +2,9 @@ import logging
 from engine.SrvEngine import Engine
 from engine import SrvEngine
 from engine.utils.Utils import load_all_handlers
-from service.game.modules.game_player_module import GamePlayerModules
+from service.game.modules.game_player_mgr import GamePlayerModules
 from engine.client.ClientMgr import ClientMgr
+import asyncio
 
 
 class GameSrv(Engine):
@@ -28,6 +29,15 @@ class GameSrv(Engine):
         await super(GameSrv, self).exit()
         logging.info("exit Game Srv")
 
+    async def on_client_request(self, client, cmd, request):
+        func = self.get_cmd(cmd)
+        if func:
+            if asyncio.iscoroutinefunction(func):
+                await func(client=client, request=request)
+            else:
+                func(client=client, request=request)
+        else:
+            logging.error(f"no rpc func:{cmd}")
 
 def run():
     srv_inst = GameSrv()

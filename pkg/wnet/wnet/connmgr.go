@@ -27,7 +27,7 @@ func NewConnManager() IConnManager {
 
 func (connMgr *ConnManager) Add(conn IConnection) {
 	connMgr.connLock.Lock()
-	connMgr.connections[conn.GetConnID()] = conn
+	connMgr.connections[conn.GetPeerID()] = conn
 	connMgr.connLock.Unlock()
 
 	fmt.Println("connection add to ConnManager successfully: conn num = ", connMgr.Len())
@@ -36,9 +36,9 @@ func (connMgr *ConnManager) Add(conn IConnection) {
 func (connMgr *ConnManager) Remove(conn IConnection) {
 
 	connMgr.connLock.Lock()
-	delete(connMgr.connections, conn.GetConnID())
+	delete(connMgr.connections, conn.GetPeerID())
 	connMgr.connLock.Unlock()
-	fmt.Println("connection Remove ConnID=", conn.GetConnID(), " successfully: conn num = ", connMgr.Len())
+	fmt.Println("connection Remove PeerID=", conn.GetPeerID(), " successfully: conn num = ", connMgr.Len())
 }
 
 func (connMgr *ConnManager) Get(connID uint32) (IConnection, error) {
@@ -79,11 +79,11 @@ func (connMgr *ConnManager) ClearOneConn(connID uint32) {
 	if conn, ok := connections[connID]; ok {
 		conn.Stop()
 		delete(connections, connID)
-		fmt.Println("Clear Connections ID:  ", connID, "succeed")
+		fmt.Println("Clear Connections MsgID:  ", connID, "succeed")
 		return
 	}
 
-	fmt.Println("Clear Connections ID:  ", connID, "err")
+	fmt.Println("Clear Connections MsgID:  ", connID, "err")
 	return
 }
 

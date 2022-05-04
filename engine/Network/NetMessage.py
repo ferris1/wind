@@ -4,13 +4,15 @@ from engine.utils.Const import ServerCmdEnum
 from engine.utils.Utils import uint_from_bytes,uint32_to_bytes
 import logging
 
+
 class Message:
-    __slots__ = ["msg_id", "cmd_id", "data_len", "data"]
+    __slots__ = ["msg_id", "cmd_id", "data_len", "data", "peer_id"]
 
     def __init__(self):
         self.msg_id = 0
         self.cmd_id = ServerCmdEnum.CmdNone
         self.data_len = 0
+        self.peer_id = 0
         self.data = bytearray()
 
     def __str__(self):
@@ -24,6 +26,7 @@ class MsgPack(Singleton):
     def pack(self, mess:Message):
         data = bytearray()
         data += uint32_to_bytes(mess.cmd_id)
+        data += uint32_to_bytes(mess.peer_id)
         data += uint32_to_bytes(mess.msg_id)
         data += uint32_to_bytes(len(mess.data))
         data += mess.data
@@ -32,9 +35,11 @@ class MsgPack(Singleton):
     def unpack(self, data):
         mess = Message()
         mess.cmd_id = uint_from_bytes(data[0:4])
-        mess.msg_id = uint_from_bytes(data[4:8])
-        mess.data_len = uint_from_bytes(data[8:12])
-        mess.data = data[12:]
+        mess.peer_id = uint_from_bytes(data[4:8])
+        mess.msg_id = uint_from_bytes(data[8:12])
+        mess.data_len = uint_from_bytes(data[12:16])
+        mess.data = data[16:]
+        logging.info(f"mess:{mess}")
         return mess
 
 

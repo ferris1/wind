@@ -1,1 +1,0 @@
-start "WindNet" cmd /c "go run main.go & pause"
