@@ -39,6 +39,7 @@ class GameSrv(Engine):
         else:
             logging.error(f"no rpc func:{cmd}")
 
+
 def run():
     srv_inst = GameSrv()
     SrvEngine.srv_inst = srv_inst

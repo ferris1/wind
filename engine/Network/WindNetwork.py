@@ -7,6 +7,8 @@ from engine.network.NetMessage import MsgPack,Message
 from engine.utils.Const import ServerCmdEnum
 from engine.utils.Utils import check_async_cb
 
+# 这里使用TCP与GO网络端进行交互
+
 
 class WindNetwork:
 
@@ -38,17 +40,10 @@ class WindNetwork:
 
         self.network_dll.StartNetThread(net_thread_address.encode(), ip.encode(), SrvEngine.srv_inst.name.encode(), port)
 
-    def net_send_data(self, peer_id, data):
+    def net_send_data(self, raw_data):
         if not self.net_transport:
             logging.error(" no net transport")
             return
-        mess = Message()
-        mess.cmd_id = ServerCmdEnum.CmdSend.value
-        mess.data = data
-        mess.peer_id = peer_id
-        mess.msg_id = 0
-        raw_data = MsgPack().pack(mess)
-        logging.info(f"net_send_data.peer_id:{peer_id}, data:{data}")
         self.net_transport.write(raw_data)
 
 

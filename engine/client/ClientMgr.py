@@ -4,6 +4,10 @@ import logging
 from engine.network.WindNetwork import WindNetwork
 from engine import SrvEngine
 import asyncio
+from engine.codec.Codec import CodecMgr
+from engine.network.NetMessage import Message
+from engine.utils.Const import ServerCmdEnum
+from engine.network.NetMessage import MsgPack
 
 
 class ClientMgr(Singleton):
@@ -32,8 +36,9 @@ class ClientMgr(Singleton):
         logging.info(f"on_net_data.peer_id:{peer_id},proto_id:{proto_id}, proto_data_len:{proto_data_len}")
         client = self.get_client_conn_by_peer(peer_id)
         if client:
-            request = proto_data.decode("utf-8")
-            asyncio.ensure_future(SrvEngine.srv_inst.on_client_request(client, request, request))
+            cmd = CodecMgr().get_proto_name(proto_id)
+            request = CodecMgr().decode(cmd, proto_data)
+            asyncio.ensure_future(SrvEngine.srv_inst.on_client_request(client, cmd, request))
 
     def create_conn(self, peer_id, address, port):
         conn = ClientConn()
@@ -74,7 +79,14 @@ class ClientConn:
         self.srv = None
 
     def send_packet(self, pck):
-        ClientMgr().wind_net.net_send_data(self.peer_id, pck)
+        mess = Message()
+        mess.cmd_id = ServerCmdEnum.CmdSend.value
+        mess.data = CodecMgr().encode(pck)
+        mess.peer_id = self.peer_id
+        mess.msg_id = CodecMgr().get_proto_id(pck.DESCRIPTOR.full_name)
+        raw_data = MsgPack().pack(mess)
+        logging.info(f" send_packet:{mess}")
+        ClientMgr().wind_net.net_send_data(raw_data)
 
     def disconnect(self):
         self.status = ClientStatus.DISCONNECTED

@@ -8,7 +8,7 @@ from engine.codec.proto_importer import *
 
 proto_id2name = dict()
 proto_name2id = dict()
-proto_id2type = dict()
+proto_name2type = dict()
 
 {class_id_statement}
 '''
@@ -109,7 +109,7 @@ def gen_proto_py(out_path):
         output_def.write("proto_id2name[{}] = '{}'\n".format(v, k))
         output_mid.write("proto_name2id['{}'] = {}\n".format(k, v))
         output_name.write("str_{0} = '{0}'\n".format(k))
-        output_obj.write("proto_id2type['{0}'] = {0}\n".format(k))
+        output_obj.write("proto_name2type['{0}'] = {0}\n".format(k))
 
     final_str = output_def.getvalue()
     final_str += output_mid.getvalue()
@@ -157,6 +157,7 @@ def gen_proto_cs(out_path, class_name):
 
 
 if __name__ == '__main__':
+    # protoc 3.20 不在直接生成协议对线 改成动态生成了
     load_meta('rpc_client', 'menu.txt')
     gen_proto_py('../gen/rpc_client/gen_proto_factory.py')
     print('success export gen_proto_factory.rpc_client')
