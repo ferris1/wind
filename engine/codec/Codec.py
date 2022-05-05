@@ -1,6 +1,7 @@
 from engine.utils.Singleton import Singleton
 from engine.codec.gen.rpc_client import gen_proto_factory
 
+
 class ClientMgr(Singleton):
     def __init__(self):
         pass
