@@ -81,7 +81,7 @@ class NetProtocol(asyncio.Protocol):
                 self.transport.write(data)
             elif mess.cmd_id == ServerCmdEnum.CmdConnect.value:
                 # 端口用msg_id替代   ip跟在data里
-                ip = str(mess.data)
+                ip = str(mess.data.decode())
                 self.net.on_connect_callback(mess.peer_id, ip, mess.msg_id)
             elif mess.cmd_id == ServerCmdEnum.CmdDisconnect.value:
                 self.net.on_disconnect_callback(mess.peer_id)

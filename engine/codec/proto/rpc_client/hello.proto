@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+
+message HelloRequest
+{
+    string player_id = 1;
+}
+
+message HelloResponse
+{
+    string player_id = 1;
+    bool result = 2;
+}
+
+message Hello2Request
+{
+    string player_id = 1;
+}
+
+message Hello2Response
+{
+    string player_id = 1;
+    bool result = 2;
+}

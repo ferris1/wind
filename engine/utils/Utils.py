@@ -32,7 +32,7 @@ def load_all_handlers(hanglers_mod):
                 f = getattr(m, k)
                 spec = inspect.getfullargspec(f)
                 if hanglers_mod == 'game.handlers':
-                    assert sorted(spec.args) == sorted(['client', 'request'])
+                    assert sorted(spec.args) == sorted(['rpc_client', 'request'])
                 cb = f
                 if asyncio.iscoroutinefunction(f):
                     cb = functools.partial(ensure_future_pack, cb)

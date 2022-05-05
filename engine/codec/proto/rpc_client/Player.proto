@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+
+message PlayerLoginRequest
+{
+    string player_id = 1;
+}
+
+message PlayerLoginResponse
+{
+    string player_id = 1;
+    bool result = 2;
+}

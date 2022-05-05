@@ -35,28 +35,24 @@ func (lg *Logger) Init(srvName string) error {
 func (lg *Logger) Info(format string, v ...interface{})  {
 	now := time.Now().UTC()
 	mid := fmt.Sprintf("[%s][INFO]: ",now.Format(DDMMYYYYhhmmss))
-	last := fmt.Sprintf(format,v...)
-	fmt.Println(lg.prefix+mid+last)
+	fmt.Println(lg.prefix, mid, fmt.Sprintf(format,v...))
 }
 
 func (lg *Logger) Warn(format string, v ...interface{})  {
 	now := time.Now().UTC()
 	mid := fmt.Sprintf("[%s][Warn]: ",now.Format(DDMMYYYYhhmmss))
-	last := fmt.Sprintf(format,v...)
-	fmt.Println(lg.prefix+mid+last)
+	fmt.Println(lg.prefix, mid, fmt.Sprintf(format,v...))
 }
 
 func (lg *Logger) Erorr(format string, v ...interface{})  {
 	now := time.Now().UTC()
 	mid := fmt.Sprintf("[%s][Erorr]: ",now.Format(DDMMYYYYhhmmss))
-	last := fmt.Sprintf(format,v...)
-	fmt.Println(lg.prefix+mid+last)
+	fmt.Println(lg.prefix, mid, fmt.Sprintf(format,v...))
 }
 
 func (lg *Logger) Fatal(format string, v ...interface{})  {
 	now := time.Now().UTC()
 	mid := fmt.Sprintf("[%s][Fatal]: ",now.Format(DDMMYYYYhhmmss))
-	last := fmt.Sprintf(format,v...)
-	fmt.Println(lg.prefix+mid+last)
+	fmt.Println(lg.prefix, mid, fmt.Sprintf(format,v...))
 }
 
