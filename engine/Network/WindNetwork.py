@@ -68,21 +68,25 @@ class NetProtocol(asyncio.Protocol):
         logging.info(f"connection_made.transport:{self.transport} ")
 
     def data_received(self, data):
-        mess = MsgPack().unpack(data)
-        if mess.cmd_id == ServerCmdEnum.CmdInit.value:
-            self.net.net_status = True
-            new = Message()
-            new.cmd_id = ServerCmdEnum.CmdInit.value
-            data = MsgPack().pack(new)
-            self.transport.write(data)
-        elif mess.cmd_id == ServerCmdEnum.CmdConnect.value:
-            # 端口用msg_id替代   ip跟在data里
-            ip = str(mess.data)
-            self.net.on_connect_callback(mess.peer_id, ip, mess.msg_id)
-        elif mess.cmd_id == ServerCmdEnum.CmdDisconnect.value:
-            self.net.on_disconnect_callback(mess.peer_id)
-        elif mess.cmd_id == ServerCmdEnum.CmdPacket.value:
-            self.net.on_packet_callback(mess.peer_id, mess.msg_id, mess.data_len, mess.data)
+        index = 0
+        # 这里是TCP流，有可能多个包粘合在一起，所以这里拆一下包
+        while index < len(data):
+            mess, index = MsgPack().unpack(data, index)
+            logging.info(f"data_received.mess:{mess} ")
+            if mess.cmd_id == ServerCmdEnum.CmdInit.value:
+                self.net.net_status = True
+                new = Message()
+                new.cmd_id = ServerCmdEnum.CmdInit.value
+                data = MsgPack().pack(new)
+                self.transport.write(data)
+            elif mess.cmd_id == ServerCmdEnum.CmdConnect.value:
+                # 端口用msg_id替代   ip跟在data里
+                ip = str(mess.data)
+                self.net.on_connect_callback(mess.peer_id, ip, mess.msg_id)
+            elif mess.cmd_id == ServerCmdEnum.CmdDisconnect.value:
+                self.net.on_disconnect_callback(mess.peer_id)
+            elif mess.cmd_id == ServerCmdEnum.CmdPacket.value:
+                self.net.on_packet_callback(mess.peer_id, mess.msg_id, mess.data_len, mess.data)
 
     def eof_received(self):
         pass

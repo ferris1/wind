@@ -32,14 +32,14 @@ class MsgPack(Singleton):
         data += mess.data
         return data
 
-    def unpack(self, data):
+    def unpack(self, data, index):
         mess = Message()
-        mess.cmd_id = uint_from_bytes(data[0:4])
-        mess.peer_id = uint_from_bytes(data[4:8])
-        mess.msg_id = uint_from_bytes(data[8:12])
-        mess.data_len = uint_from_bytes(data[12:16])
-        mess.data = data[16:]
-        logging.info(f"mess:{mess}")
-        return mess
+        mess.cmd_id = uint_from_bytes(data[index:index+4])
+        mess.peer_id = uint_from_bytes(data[index+4:index+8])
+        mess.msg_id = uint_from_bytes(data[index+8:index+12])
+        mess.data_len = uint_from_bytes(data[index+12:index+16])
+        mess.data = data[index+16:index+16+mess.data_len]
+        index = index+16+mess.data_len
+        return mess, index
 
 
