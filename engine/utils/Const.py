@@ -11,3 +11,8 @@ class ServerCmdEnum(IntEnum):
 
     CmdSend = 100
     CmdExit = 101
+
+
+class SeverType(IntEnum):
+    GAME = 1
+    GATEWAY = 2

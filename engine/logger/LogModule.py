@@ -2,6 +2,7 @@
 import sys, logging, logging.handlers
 from pathlib import Path
 
+
 def init_log(srv):
     file_name = f'{srv.name}.{((str(sys.argv[1])) if len(sys.argv) > 1 else "")}'
     set_log(f"{srv.name}", True, file_name=file_name)

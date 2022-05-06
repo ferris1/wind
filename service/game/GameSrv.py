@@ -5,14 +5,16 @@ from engine.utils.Utils import load_all_handlers
 from service.game.modules.game_player_mgr import GamePlayerModules
 from engine.client.ClientMgr import ClientMgr
 import asyncio
+from engine.utils.Const import SeverType
 
 
 class GameSrv(Engine):
     def __init__(self):
-        super().__init__("GameSrv")
+        super().__init__("GameSrv", SeverType.GAME.value)
 
     async def init(self):
         await super().init()
+        self.registry.add_watches({SeverType.GAME.value})
         await ClientMgr().init(self.ip, self.port)
 
     async def register(self):

@@ -1,1 +1,2 @@
 protobuf==3.19.2
+aioetcd3==1.13

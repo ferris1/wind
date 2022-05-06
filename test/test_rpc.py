@@ -1,8 +1,7 @@
 import asyncio
 from engine.codec.proto_importer import PlayerLoginRequest
 from engine.codec.Codec import CodecMgr
-from engine.utils.Utils import uint_from_bytes,uint32_to_bytes
-
+from engine.utils.Utils import uint_from_bytes, uint32_to_bytes
 from engine.utils.Singleton import Singleton
 
 

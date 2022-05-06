@@ -4,17 +4,18 @@ import logging
 from engine.logger.LogModule import init_log
 import sys
 from engine.utils.Utils import init_asyncio_loop_policy
+from engine.registry.EtcdRegistry import EtcdRegistry
 
 # python 3.9.12
 
 
 class Engine:
-    def __init__(self, name: str, process_pool: int = None) -> None:
-        self.exiting = False
+    def __init__(self, name: str, typ, process_pool: int = None) -> None:
+        self.exited = False
         self.server_id: str = uuid.uuid4().hex
         self.sid: bytes = self.server_id.encode()
         self.name: str = name
-
+        self.server_type = typ
         self.ip = "127.0.0.1"
         self.port = 0
 
@@ -25,6 +26,7 @@ class Engine:
 
         # 以下为各个插件
         init_log(self)
+        self.registry = EtcdRegistry()
 
     async def init(self):
         logging.info("SrvEngine Init")
@@ -33,12 +35,13 @@ class Engine:
             raise ValueError("没有传递可用窗口")
         else:
             self.port = int(sys.argv[1])
+        self.registry.init(srv_inst)
 
     async def register(self):
-        pass
+        await self.registry.register(self.server_id, self.server_type)
 
     async def start(self):
-        pass
+        await self.registry.watch_servers()
 
     async def exit(self):
         pass
@@ -81,6 +84,18 @@ class Engine:
         else:
             logging.error(f"no rpc func:{cmd}")
 
+    def get_report_info(self):
+        info = {
+            'ip': self.ip,
+            'port': self.port,
+        }
+        return info
+
+    def on_server_del(self, info):
+        logging.error(f"on_server_del.info:{info} ")
+
+    def on_server_add(self, info):
+        logging.error(f"on_server_add.info:{info} ")
 
 # engine 实例
 srv_inst: Engine = None
