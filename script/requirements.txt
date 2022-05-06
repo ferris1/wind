@@ -1,2 +1,3 @@
 protobuf==3.19.2
 aioetcd3==1.13
+nats-py==2.1.0

@@ -1,8 +1,7 @@
 
 from engine.utils.Singleton import Singleton
 from engine.utils.Const import ServerCmdEnum
-from engine.utils.Utils import uint_from_bytes,uint32_to_bytes
-import logging
+from engine.utils.Utils import uint_from_bytes, uint32_to_bytes
 
 
 class Message:

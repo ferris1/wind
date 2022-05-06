@@ -3,8 +3,10 @@ import asyncio
 import logging
 from engine.logger.LogModule import init_log
 import sys
-from engine.utils.Utils import init_asyncio_loop_policy
+from engine.utils.Utils import init_asyncio_loop_policy,load_all_handlers
 from engine.registry.EtcdRegistry import EtcdRegistry
+from engine.broker.NatsBroker import NatsBroker
+from engine.broker.BrokerPack import BrokerPack
 
 # python 3.9.12
 
@@ -15,18 +17,20 @@ class Engine:
         self.server_id: str = uuid.uuid4().hex
         self.sid: bytes = self.server_id.encode()
         self.name: str = name
-        self.server_type = typ
+        self.server_type:int = typ
         self.ip = "127.0.0.1"
         self.port = 0
 
         self.request_que = asyncio.Queue()
-        self.cmd_map = {}
+        self.client_cmd_map = {}
+        self.server_cmd_map = {}
         init_asyncio_loop_policy()
         self.loop = asyncio.get_event_loop()
 
         # 以下为各个插件
         init_log(self)
         self.registry = EtcdRegistry()
+        self.broker = NatsBroker()
 
     async def init(self):
         logging.info("SrvEngine Init")
@@ -36,9 +40,12 @@ class Engine:
         else:
             self.port = int(sys.argv[1])
         self.registry.init(srv_inst)
+        await self.broker.init(srv_inst)
 
     async def register(self):
+        self.register_server_cmd(load_all_handlers('service.game.handlers_server'))
         await self.registry.register(self.server_id, self.server_type)
+        await self.broker.subscribe()
 
     async def start(self):
         await self.registry.watch_servers()
@@ -67,20 +74,42 @@ class Engine:
             self.loop.close()
             logging.info("loop closed!!")
 
-    def register_cmd(self, cmd_dct):
-        self.cmd_map.update(cmd_dct)
+    def register_client_cmd(self, cmd_dct):
+        self.client_cmd_map.update(cmd_dct)
 
-    def get_cmd(self, name):
-        logging.info(f"name:{name}, cmd_map:{self.cmd_map}")
-        return self.cmd_map.get(name)
+    def register_server_cmd(self, cmd_dct):
+        self.server_cmd_map.update(cmd_dct)
 
+    def get_client_cmd(self, name):
+        return self.client_cmd_map.get(name)
+
+    def get_server_cmd(self, name):
+        return self.server_cmd_map.get(name)
+
+    # 客户端的RPC request 默认采用client和request
     async def on_client_request(self, client, cmd, request):
-        func = self.get_cmd(cmd)
+        func = self.get_client_cmd(cmd)
         if func:
             if asyncio.iscoroutinefunction(func):
-                await func(client=client, request=request)
+                await func(client, request)
             else:
-                func(client=client, request=request)
+                func(client, request)
+        else:
+            logging.error(f"no rpc func:{cmd}")
+
+    # 服务器的RPC 默认采用pid 和 pck
+    async def on_server_message(self, data):
+        pid, cmd, pck = BrokerPack().unpack(data)
+        # 优先查看是否是转发过来的客户端包 是的话由客户端来处理
+        if self.get_client_cmd(cmd):
+            await self.on_client_request(pid, cmd, pck)
+            return
+        func = self.get_client_cmd(cmd)
+        if func:
+            if asyncio.iscoroutinefunction(func):
+                await func(pid, pck)
+            else:
+                func(pid, pck)
         else:
             logging.error(f"no rpc func:{cmd}")
 
@@ -96,6 +125,20 @@ class Engine:
 
     def on_server_add(self, info):
         logging.error(f"on_server_add.info:{info} ")
+
+    # 一般为了节省内部流量 服务器内部消息头不加pid
+    async def send_server_message(self, server_type, server_id, pid, pck):
+        cmd = pck.DESCRIPTOR.full_name
+        data = BrokerPack().pack(pid, cmd, pck)
+        if server_id is not None and server_id != "":
+            await self.broker.send_to_server(server_id, data)
+        elif server_id == "*":
+            await self.broker.send_to_group_server(server_type, data)
+        else:
+            await self.broker.send_to_all_server(data)
+
+
+
 
 # engine 实例
 srv_inst: Engine = None

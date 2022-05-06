@@ -13,6 +13,8 @@ class ServerCmdEnum(IntEnum):
     CmdExit = 101
 
 
-class SeverType(IntEnum):
+class SeverType:
     GAME = 1
     GATEWAY = 2
+
+    ALLSERVER = 100

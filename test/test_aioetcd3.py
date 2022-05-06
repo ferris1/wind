@@ -1,6 +1,6 @@
 
 from aioetcd3.client import client
-from engine.config.IpConfig import ETCD_ADDRS
+from engine.config.IpConfig import ETCD_ADDR
 from aioetcd3.help import range_prefix
 from aioetcd3.watch import EVENT_TYPE_CREATE,EVENT_TYPE_DELETE,EVENT_TYPE_MODIFY
 import asyncio
@@ -8,7 +8,7 @@ from contextlib import suppress
 
 
 async def test_watch():
-    c = client(ETCD_ADDRS)
+    c = client(ETCD_ADDR)
     print("test_watch")
     async with c.watch_scope(range_prefix('/foo/')) as response:
         async for event in response:
@@ -25,7 +25,7 @@ async def test_watch():
 
 
 async def test_create():
-    c = client(ETCD_ADDRS)
+    c = client(ETCD_ADDR)
     print("test_create")
     for i in range(30):
         key = f"/foo/{i}"

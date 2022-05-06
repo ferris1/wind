@@ -21,18 +21,15 @@ def create_async_task(co, *args, **kwargs):
     return asyncio.create_task(co(*args, **kwargs))
 
 
-def load_all_handlers(hanglers_mod):
-    root = importlib.import_module(hanglers_mod)
+def load_all_handlers(handlers_mod):
+    root = importlib.import_module(handlers_mod)
     cmd_map = {}
-    logging.info(f'Load handler in {hanglers_mod}')
+    logging.info(f'Load handler in {handlers_mod}')
     for modname in root.__handlers__:
-        m = importlib.import_module(hanglers_mod + '.' + modname)
+        m = importlib.import_module(handlers_mod + '.' + modname)
         for k in dir(m):
             if k.startswith('Handler_'):
                 f = getattr(m, k)
-                spec = inspect.getfullargspec(f)
-                if hanglers_mod == 'game.handlers':
-                    assert sorted(spec.args) == sorted(['rpc_client', 'request'])
                 cb = f
                 if asyncio.iscoroutinefunction(f):
                     cb = functools.partial(create_async_task, cb)

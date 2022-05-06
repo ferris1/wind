@@ -1,5 +1,5 @@
 from aioetcd3.client import client
-from engine.config.IpConfig import ETCD_ADDRS
+from engine.config.IpConfig import ETCD_ADDR
 from engine.config.Config import ETCD_GROUP
 import json
 
@@ -9,7 +9,7 @@ import asyncio
 async def test_add():
     key = '/' + ETCD_GROUP + '/servers/' + '1' + '/'
 
-    c = client(ETCD_ADDRS)
+    c = client(ETCD_ADDR)
 
     info = {
         'ip': "127.0.0.1",
@@ -26,7 +26,7 @@ async def test_add():
 async def test_delete():
     key = '/' + ETCD_GROUP + '/servers/' + '1' + '/'
     await asyncio.sleep(5)
-    c = client(ETCD_ADDRS)
+    c = client(ETCD_ADDR)
     print("put hello1")
     await c.delete(key + "hello1")
     print("put hello2")

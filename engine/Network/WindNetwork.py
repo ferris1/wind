@@ -67,7 +67,6 @@ class NetProtocol(asyncio.Protocol):
         # 这里是TCP流，有可能多个包粘合在一起，所以这里拆一下包
         while index < len(data):
             mess, index = MsgPack().unpack(data, index)
-            logging.info(f"data_received.mess:{mess} ")
             if mess.cmd_id == ServerCmdEnum.CmdInit.value:
                 self.net.net_status = True
                 new = Message()

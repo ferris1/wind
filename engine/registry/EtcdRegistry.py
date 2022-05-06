@@ -1,5 +1,5 @@
 from aioetcd3.client import client
-from engine.config.IpConfig import ETCD_ADDRS
+from engine.config.IpConfig import ETCD_ADDR
 from engine.config import Config
 import logging
 import json
@@ -7,12 +7,13 @@ from aioetcd3.help import range_prefix
 import asyncio
 from aioetcd3.watch import Event, EVENT_TYPE_DELETE
 from contextlib import suppress
-# use aioetcd3   https://github.com/gaopeiliang/aioetcd3
 
+
+# use aioetcd3   https://github.com/gaopeiliang/aioetcd3
 
 class EtcdRegistry:
     def __init__(self):
-        self.aio_etcd = client(ETCD_ADDRS)
+        self.aio_etcd = client(ETCD_ADDR)
         self.etcd_lease = None
         self.etcd_lease_ttl = Config.ETCD_TTL
         self.etcd_group = Config.ETCD_GROUP    # 确保一个etcd数据库可以服务多个服务器
