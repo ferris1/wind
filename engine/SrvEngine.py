@@ -43,7 +43,7 @@ class Engine:
         await self.broker.init(srv_inst)
 
     async def register(self):
-        self.register_server_cmd(load_all_handlers('service.game.handlers_server'))
+        self.register_server_cmd(load_all_handlers('engine.handlers'))
         await self.registry.register(self.server_id, self.server_type)
         await self.broker.subscribe()
 
@@ -86,7 +86,7 @@ class Engine:
     def get_server_cmd(self, name):
         return self.server_cmd_map.get(name)
 
-    # 客户端的RPC request 默认采用client和request
+    # 客户端的RPC 处理函数参数默认采用client和request
     async def on_client_request(self, client, cmd, request):
         func = self.get_client_cmd(cmd)
         if func:
@@ -97,7 +97,7 @@ class Engine:
         else:
             logging.error(f"no rpc func:{cmd}")
 
-    # 服务器的RPC 默认采用pid 和 pck
+    # 服务器的RPC 处理函数参数默认采用pid和pck
     async def on_server_message(self, data):
         pid, cmd, pck = BrokerPack().unpack(data)
         # 优先查看是否是转发过来的客户端包 是的话由客户端来处理

@@ -1,0 +1,13 @@
+
+syntax = "proto3";
+
+// 服务器协议以S_开头
+message S_GameHello
+{
+	  string hello = 1;
+}
+
+message S_GameHelloAck
+{
+    string helloAck = 1;
+}

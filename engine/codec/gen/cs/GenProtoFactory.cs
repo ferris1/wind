@@ -11,9 +11,6 @@ namespace NetworkCodec
 		{
 			switch (proto_id)
 			{
-				case 1002:
-					var res1002 = new PlayerLoginResponse();
-					return res1002;
 
 			}
 			return null;
@@ -29,9 +26,6 @@ namespace NetworkCodec
 			IMessage ret;
 			switch (proto_id)
 			{
-				case 1002:
-					ret = PlayerLoginResponse.Parser.ParseFrom(data_sequence);
-					return ret;
 
 			}
 			return null;
@@ -41,9 +35,6 @@ namespace NetworkCodec
 		{
 			switch (protoId)
 			{
-				case 1002:
-					ServerRpcImplement.On_PlayerLoginResponse((PlayerLoginResponse)m);
-				break;
 
 			}
 		}	
@@ -52,16 +43,16 @@ namespace NetworkCodec
 		{
 			switch (name)
 			{
-				case "PlayerLoginRequest":
-					return 1001;
-				case "PlayerLoginResponse":
-					return 1002;
+				case "S_GameHello":
+					return 6001;
+				case "S_GameHelloAck":
+					return 6002;
 
 			}
 			return 0;
 		}	
-		public static readonly string PlayerLoginRequest_NAME = "PlayerLoginRequest";
-		public static readonly string PlayerLoginResponse_NAME = "PlayerLoginResponse";
+		public static readonly string S_GameHello_NAME = "S_GameHello";
+		public static readonly string S_GameHelloAck_NAME = "S_GameHelloAck";
 
 	}
 }

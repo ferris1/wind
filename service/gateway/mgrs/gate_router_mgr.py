@@ -1,7 +1,7 @@
 from engine.utils.Singleton import Singleton
 
 
-class GamePlayerMgr(Singleton):
+class GateRouterMgr(Singleton):
     def __init__(self):
         pass
 

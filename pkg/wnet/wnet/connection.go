@@ -31,10 +31,8 @@ type Connection struct {
 	IsPyConn    bool
 	ctx         context.Context
 	cancel      context.CancelFunc
-	msgBuffChan chan []byte
 
 	sync.RWMutex
-	propertyLock sync.Mutex
 	isClosed bool
 }
 
@@ -45,7 +43,6 @@ func NewConnection(server INetServer, conn net.Conn, peerID uint32, msgHandler I
 		PeerID:      peerID,
 		isClosed:    false,
 		MsgHandler:  msgHandler,
-		msgBuffChan: make(chan []byte, 1024),
 		IsPyConn:    isPyConn,
 	}
 	c.Server.GetConnMgr().Add(c)
