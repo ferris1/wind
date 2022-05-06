@@ -14,6 +14,7 @@ class ServerCmdEnum(IntEnum):
 
 
 class SeverType:
+    NONE = 0
     GAME = 1
     GATEWAY = 2
 

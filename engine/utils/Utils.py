@@ -35,7 +35,7 @@ def load_all_handlers(handlers_mod):
                     cb = functools.partial(create_async_task, cb)
                 assert (f.__name__[8:] not in cmd_map.keys())
                 cmd_map[f.__name__[8:]] = cb
-    logging.info(f'Loading finish with {len(cmd_map)} methods')
+    logging.info(f'Loading finish with {len(cmd_map)} methods, cmd_map:{cmd_map}')
     return cmd_map
 
 

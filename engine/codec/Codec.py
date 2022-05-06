@@ -25,7 +25,7 @@ class CodecMgr(Singleton):
 
     def get_proto_id(self, proto_name):
         _id = factory_client.proto_name2id.get(proto_name, 0)
-        if _id:
+        if _id != 0:
             return _id
         return factory_server.proto_name2id.get(proto_name, 0)
 

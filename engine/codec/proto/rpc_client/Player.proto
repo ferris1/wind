@@ -11,3 +11,15 @@ message PlayerLoginResponse
     string player_id = 1;
     bool result = 2;
 }
+
+
+message CreateRoleRequest
+{
+    string player_id = 1;
+}
+
+message CreateRoleResponse
+{
+    string player_id = 1;
+    bool result = 2;
+}

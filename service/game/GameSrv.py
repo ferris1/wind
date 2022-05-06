@@ -12,8 +12,7 @@ class GameSrv(Engine):
 
     async def init(self):
         await super().init()
-        self.registry.add_watches({SeverType.GAME})
-        await ClientMgr().init(self.ip, self.port)
+        self.registry.add_watches({SeverType.GAME,SeverType.GATEWAY})
 
     async def register(self):
         await super(GameSrv, self).register()

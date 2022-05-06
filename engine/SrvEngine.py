@@ -7,7 +7,7 @@ from engine.utils.Utils import init_asyncio_loop_policy,load_all_handlers
 from engine.registry.EtcdRegistry import EtcdRegistry
 from engine.broker.NatsBroker import NatsBroker
 from engine.broker.BrokerPack import BrokerPack
-
+from engine.utils.Const import SeverType
 # python 3.9.12
 
 
@@ -98,13 +98,13 @@ class Engine:
             logging.error(f"no rpc func:{cmd}")
 
     # 服务器的RPC 处理函数参数默认采用pid和pck
-    async def on_server_message(self, data):
-        pid, cmd, pck = BrokerPack().unpack(data)
+    async def on_server_message(self, pid, cmd, pck):
+        logging.info(f"on_server_message:pid:{pid}, cmd:{cmd}, pck:{pck}")
         # 优先查看是否是转发过来的客户端包 是的话由客户端来处理
         if self.get_client_cmd(cmd):
             await self.on_client_request(pid, cmd, pck)
             return
-        func = self.get_client_cmd(cmd)
+        func = self.get_server_cmd(cmd)
         if func:
             if asyncio.iscoroutinefunction(func):
                 await func(pid, pck)
@@ -130,14 +130,15 @@ class Engine:
     async def send_server_message(self, server_type, server_id, pid, pck):
         cmd = pck.DESCRIPTOR.full_name
         data = BrokerPack().pack(pid, cmd, pck)
-        if server_id is not None and server_id != "":
-            await self.broker.send_to_server(server_id, data)
-        elif server_id == "*":
+        if server_id == "*":
             await self.broker.send_to_group_server(server_type, data)
+        elif server_id is not None and server_id != "":
+            await self.broker.send_to_server(server_id, data)
         else:
             await self.broker.send_to_all_server(data)
 
-
+    async def send_response_by_gateway(self, pid, pck):
+        await self.send_server_message(SeverType.GATEWAY, "*", pid, pck)
 
 
 # engine 实例
