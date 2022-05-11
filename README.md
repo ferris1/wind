@@ -9,7 +9,7 @@ Wind是一款面向云的高性能、高效率以及高扩展性的大型分布�
 游戏界有Unity和Unreal这样完善并且开箱即用的客户端引擎，这样的引擎大大缩短了游戏的开发周期，基本上一天就能做一个能跑的游戏。但是却并不存在一款大家熟知分布式服务器引擎，这样的服务器引擎可以快速上手并且能满足游戏各个阶段的开发需求。Wind致力于做一款易上手且完善的分布式服务器引擎，帮助独立游戏开发者或者中小企业快速搭建服务器框架并且快速开发游戏业务，降低游戏服务器开发难度与成本。
 
 # Wind特性
-
+- [x] **游戏服务器首次结合go与python的优点**
 - [x] **利用Python简明的语法与丰富的生态库来编写业务量大的游戏业务逻辑，提升开发效率。**
 - [x] **利用Golang来保证引擎底层功能或者实时性游戏业务的高性能。**
 - [x] **方便的RPC使用流程，只需要在handlers_client/server目录下编写以handler_开头的函数就可自动注册。**
@@ -26,7 +26,7 @@ Wind是一款面向云的高性能、高效率以及高扩展性的大型分布�
 
 - **安装Python**
 
-Wind默认在Windows平台下开发，支持Linux下Docker部署。Wind业务逻辑使用Python编写，运行前需要安装Python版本，我的Python版本是3.9，支持Python3.5+。
+Wind默认在Windows平台下开发，支持Linux下Docker部署。Wind业务逻辑使用Python编写，Golang编译成动态库供python调用，运行前需要安装Python版本，我的Python版本是3.9，支持Python3.5+。
 
 Wind使用Etcd做服务发现功能，使用Nats做分布式消息队列，所以需要安装对应Python客户端库。在script目录下运行 **`install_python_requirements.bat`**  安装对应python库。
 
