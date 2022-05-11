@@ -1,6 +1,7 @@
 from engine.utils.Singleton import Singleton
 from engine.utils.Const import SeverType
 
+# 没填的默认路由到logic
 server_router_dict = {
     SeverType.GAME: ["CreateRoleRequest"]
 }
