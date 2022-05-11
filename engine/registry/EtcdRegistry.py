@@ -21,6 +21,7 @@ class EtcdRegistry:
         self.online_servers = dict()
         self.watched_tasks = []
         self.srv_inst = None
+        self.status = False
 
     def init(self, srv_inst):
         self.srv_inst = srv_inst
@@ -129,4 +130,7 @@ class EtcdRegistry:
                 self.etcd_lease = None
         except Exception as e:
             logging.error(f'error when clean etcd: {e}')
+
+    async def server_heartbeat(self):
+        pass
 

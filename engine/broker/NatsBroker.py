@@ -5,8 +5,8 @@ import nats
 from nats.errors import Error, TimeoutError, NoServersError
 import logging
 from engine.utils.Const import SeverType
-from functools import partial
 from engine.broker.BrokerPack import BrokerPack
+
 
 class NatsBroker:
     def __init__(self):
@@ -40,8 +40,6 @@ class NatsBroker:
         logging.info(" nats subscribe finish")
 
     async def on_nats_message(self, msg):
-        subject = msg.subject
-        reply = msg.reply
         data = msg.data
         pid, cmd, pck = BrokerPack().unpack(data)
         logging.info(f"on_nats_message:{msg} ")

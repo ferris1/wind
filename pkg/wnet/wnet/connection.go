@@ -246,7 +246,5 @@ func (c *Connection) finalizer() {
 	}
 	_ = c.Conn.Close()
 	c.Server.GetConnMgr().Remove(c)
-	close(c.msgBuffChan)
-	//设置标志位
 	c.isClosed = true
 }
