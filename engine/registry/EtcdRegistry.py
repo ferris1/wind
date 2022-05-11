@@ -23,10 +23,19 @@ class EtcdRegistry:
         self.srv_inst = None
         self.status = False
 
-    def init(self, srv_inst):
+    async def init(self, srv_inst):
         self.srv_inst = srv_inst
+        try:
+            await self.aio_etcd.status()
+        except Exception as ex:
+            logging.error("no etcd valid server")
+            self.status = False
+        else:
+            self.status = True
 
     async def register(self, server_id, server_type):
+        if not self.status:
+            return
         self.etcd_lease = await self.aio_etcd.grant_lease(self.etcd_lease_ttl)
         node_key = self.get_type_key(self.srv_inst.server_type) + self.srv_inst.server_id
         info = self.srv_inst.get_report_info()
@@ -43,6 +52,8 @@ class EtcdRegistry:
         self.watch_types.update(type_lst)
 
     async def watch_servers(self):
+        if not self.status:
+            return
         logging.info(f"start watch types:{self.watch_types}")
         for server_type in self.watch_types:
             await self.update_servers_by_type(server_type)

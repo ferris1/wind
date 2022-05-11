@@ -39,7 +39,7 @@ class Engine:
             raise ValueError("没有传递可用窗口")
         else:
             self.port = int(sys.argv[1])
-        self.registry.init(srv_inst)
+        await self.registry.init(srv_inst)
         await self.broker.init(srv_inst)
 
     async def register(self):
