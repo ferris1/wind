@@ -39,14 +39,14 @@ git clone https://github.com/ferris1/wind.git
 
 - **启动单个服务**
 
-在script下运行 `start_gateway.bat` 启动gateway服务
+在script目录下运行 `start_gateway.bat` 启动gateway服务
 ![wind run](doc/wind_console.png)
 
 - **启动分布式服务**
 
 启动分布式服务时需要保证运行Etcd服和Nats服，具体运行参考官网，要不然各个服务不能合作运行。
 
-在script下运行 `start_all.bat` 启动所有服务，目前只有两类服务，一个是Gateway服务，用于消息路由，一个是Game服务，用于处理游戏逻辑。
+在script目录下运行 `start_all.bat` 启动所有服务，目前只有两类服务，一个是Gateway服务，用于消息路由，一个是Game服务，用于处理游戏逻辑。
 
 Wind只是分布式服务器引擎，最终的分布式服务框架还需要你自己设计，具体可以参考这边文章[从服务器发展史看现代游戏服务器架构](https://zhuanlan.zhihu.com/p/500840594)
 
@@ -73,7 +73,7 @@ message PlayerLoginResponse
 
 - **RPC函数**
 
-然后你只需要在对应服务的`handlers_client`下编写RPC函数，服务器启动时会自动注册RPC函数，然后就可以服务客户端请求了，比如Gateway服务下的`handler_player`
+然后你只需要在对应服务的`handlers_client`目录下编写RPC函数，服务器启动时会自动注册RPC函数，然后就可以服务客户端请求了，比如Gateway服务下的`handler_player`
 
 ```python
 
