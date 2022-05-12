@@ -90,6 +90,9 @@ async def Handler_PlayerLoginRequest(client: ClientConn, request):
     pck.result = True
     client.send_packet(pck)
 ```
+# Exmaple
+目前有个Python的小客户端
+
 
 # 文档
 
