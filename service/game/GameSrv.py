@@ -16,8 +16,9 @@ class GameSrv(Engine):
 
     async def register(self):
         await super(GameSrv, self).register()
-        self.register_client_cmd(load_all_handlers('service.game.handlers_client'))
-        self.register_server_cmd(load_all_handlers('service.game.handlers_server'))
+        client_cmd, server_cmd = load_all_handlers('service.game.handlers')
+        self.register_server_cmd(server_cmd)
+        self.register_client_cmd(client_cmd)
 
     async def start(self):
         await super(GameSrv, self).start()

@@ -1,6 +1,8 @@
 import uuid
 import asyncio
 import logging
+from functools import wraps
+
 from engine.logger.LogModule import init_log
 import sys
 from engine.utils.Utils import init_asyncio_loop_policy,load_all_handlers
@@ -8,6 +10,9 @@ from engine.registry.EtcdRegistry import EtcdRegistry
 from engine.broker.NatsBroker import NatsBroker
 from engine.broker.BrokerPack import BrokerPack
 from engine.utils.Const import SeverType
+from engine.selector.Selector import Selector
+import asyncio
+from engine.config import Config
 # python 3.9.12
 
 
@@ -20,7 +25,7 @@ class Engine:
         self.server_type:int = typ
         self.ip = "127.0.0.1"
         self.port = 0
-
+        self.is_external = False    # 标识是否是对外服务器  如果是的话会有ClientMgr组件,也就是直接与客户端连接的服务器
         self.request_que = asyncio.Queue()
         self.client_cmd_map = {}
         self.server_cmd_map = {}
@@ -28,24 +33,35 @@ class Engine:
         self.loop = asyncio.get_event_loop()
 
         # 以下为各个插件
-        init_log(self)
+
         self.registry = EtcdRegistry()
         self.broker = NatsBroker()
+        self.selector = Selector()
 
     async def init(self):
+        init_log(self)
         logging.info("SrvEngine Init")
         argv_len = len(sys.argv)
-        if argv_len < 2:
-            raise ValueError("没有传递可用窗口")
+        if argv_len < 3:
+            raise ValueError("not valid argv: port IsSingle ")
         else:
             self.port = int(sys.argv[1])
-        await self.registry.init(srv_inst)
-        await self.broker.init(srv_inst)
+        # 是否是单机版本 nats 连接出错的时候 还不能try except
+        if sys.argv[2] == "True":
+            Config.LaunchSingle(True)
+        if Config.USE_ETCD:
+            await self.registry.init(srv_inst)
+        if Config.USE_NATS:
+            await self.broker.init(srv_inst)
+        self.selector.init(self.registry)
 
     async def register(self):
-        self.register_server_cmd(load_all_handlers('engine.handlers'))
+        client_cmd, server_cmd = load_all_handlers('engine.handlers')
+        self.register_server_cmd(server_cmd)
+        self.register_client_cmd(client_cmd)
         await self.registry.register(self.server_id, self.server_type)
         await self.broker.subscribe()
+        self.add_timer(self.registry.tick, int(Config.ETCD_TTL / 2))
 
     async def start(self):
         await self.registry.watch_servers()
@@ -86,7 +102,7 @@ class Engine:
     def get_server_cmd(self, name):
         return self.server_cmd_map.get(name)
 
-    # 客户端的RPC 处理函数参数默认采用client和request
+    # 如果是直连客户端的服务器 第一个参数是client否者是player_id
     async def on_client_request(self, client, cmd, request):
         func = self.get_client_cmd(cmd)
         if func:
@@ -97,10 +113,14 @@ class Engine:
         else:
             logging.error(f"no rpc func:{cmd}")
 
-    # 服务器的RPC 处理函数参数默认采用pid和pck
+    def send_response_client(self, pid, pck):
+        logging.info("由外部服务继承，并重写方法")
+
+    # 如果是直连客户端的服务器 第一个参数是client否者是player_id
+    # 如果是外部服务器 可以继承重写方法
     async def on_server_message(self, pid, cmd, pck):
         logging.info(f"on_server_message:pid:{pid}, cmd:{cmd}, pck:{pck}")
-        # 优先查看是否是转发过来的客户端包 是的话由客户端来处理
+        # 查看是否是转发过来的客户端包 是的话由客户端来处理
         if self.get_client_cmd(cmd):
             await self.on_client_request(pid, cmd, pck)
             return
@@ -112,6 +132,23 @@ class Engine:
                 func(pid, pck)
         else:
             logging.error(f"no rpc func:{cmd}")
+
+    # 定时函数
+    def add_timer(self, func=None, interval=60, *args, **kwargs):
+        if func is None or self.exited:
+            return
+
+        async def decorated(*args, **kwargs):
+            while True:
+                await asyncio.sleep(interval, loop=self.loop)
+                try:
+                    if asyncio.iscoroutinefunction(func):
+                        await func(*args, **kwargs)
+                    else:
+                        func(*args, **kwargs)
+                except Exception as e:
+                    logging.error(f"timer func:{func} exec error e:{e}")
+        self.loop.create_task(decorated())
 
     def get_report_info(self):
         info = {
@@ -127,18 +164,19 @@ class Engine:
         logging.error(f"on_server_add.info:{info} ")
 
     # 一般为了节省内部流量 服务器内部消息头不加pid
-    async def send_server_message(self, server_type, server_id, pid, pck):
+    def send_server_message(self, server_type, server_id, pid, pck):
         cmd = pck.DESCRIPTOR.full_name
         data = BrokerPack().pack(pid, cmd, pck)
+        logging.info(f"send server_type:{server_type}, server_id:{server_id}, pck:{pck}")
         if server_id == "*":
-            await self.broker.send_to_group_server(server_type, data)
+            self.loop.create_task(self.broker.send_to_group_server(server_type, data))
         elif server_id is not None and server_id != "":
-            await self.broker.send_to_server(server_id, data)
+            self.loop.create_task(self.broker.send_to_server(server_id, data))
         else:
-            await self.broker.send_to_all_server(data)
+            self.loop.create_task(self.broker.send_to_all_server(data))
 
-    async def send_response_by_gateway(self, pid, pck):
-        await self.send_server_message(SeverType.GATEWAY, "*", pid, pck)
+    def send_response_by_gateway(self, pid, pck, sid="*"):
+        self.send_server_message(SeverType.GATEWAY, sid, pid, pck)
 
 
 # engine 实例

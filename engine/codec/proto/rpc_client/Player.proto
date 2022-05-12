@@ -16,10 +16,27 @@ message PlayerLoginResponse
 message CreateRoleRequest
 {
     string player_id = 1;
+    int32 role_id = 2;
 }
 
 message CreateRoleResponse
 {
     string player_id = 1;
-    bool result = 2;
+    int32 role_id = 2;
+    bool result = 3;
 }
+
+message SpeakOnWorldRequest
+{
+    string player_id = 1;
+    string name = 2;
+    string content = 3;
+}
+
+message SpeakOnWorldResponse
+{
+    string speak_id = 1;
+    string name = 2;
+    string content = 3;
+}
+

@@ -11,3 +11,25 @@ message S_GameHelloAck
 {
     string helloAck = 1;
 }
+
+// gate发送到game取消协议
+message S_PlayerRegister
+{
+	  string player_id = 1;
+	  string gate_server_id = 2;
+}
+
+message S_PlayerRegisterAck
+{
+    bool result = 1;
+}
+
+message S_PlayerUnRegister
+{
+	  string player_id = 1;
+}
+
+message S_PlayerUnRegisterAck
+{
+    bool result = 1;
+}

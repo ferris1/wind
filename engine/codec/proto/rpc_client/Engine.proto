@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message HeartbeatRequest
+{
+    string player_id = 1;
+}

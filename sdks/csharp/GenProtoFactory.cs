@@ -47,12 +47,24 @@ namespace NetworkCodec
 					return 6001;
 				case "S_GameHelloAck":
 					return 6002;
+				case "S_PlayerRegister":
+					return 6003;
+				case "S_PlayerRegisterAck":
+					return 6004;
+				case "S_PlayerUnRegister":
+					return 6005;
+				case "S_PlayerUnRegisterAck":
+					return 6006;
 
 			}
 			return 0;
 		}	
 		public static readonly string S_GameHello_NAME = "S_GameHello";
 		public static readonly string S_GameHelloAck_NAME = "S_GameHelloAck";
+		public static readonly string S_PlayerRegister_NAME = "S_PlayerRegister";
+		public static readonly string S_PlayerRegisterAck_NAME = "S_PlayerRegisterAck";
+		public static readonly string S_PlayerUnRegister_NAME = "S_PlayerUnRegister";
+		public static readonly string S_PlayerUnRegisterAck_NAME = "S_PlayerUnRegisterAck";
 
 	}
 }

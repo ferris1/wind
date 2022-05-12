@@ -14,12 +14,16 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nGame.proto\"\x1c\n\x0bS_GameHello\x12\r\n\x05hello\x18\x01 \x01(\t\"\"\n\x0eS_GameHelloAck\x12\x10\n\x08helloAck\x18\x01 \x01(\tb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nGame.proto\"\x1c\n\x0bS_GameHello\x12\r\n\x05hello\x18\x01 \x01(\t\"\"\n\x0eS_GameHelloAck\x12\x10\n\x08helloAck\x18\x01 \x01(\t\"=\n\x10S_PlayerRegister\x12\x11\n\tplayer_id\x18\x01 \x01(\t\x12\x16\n\x0egate_server_id\x18\x02 \x01(\t\"%\n\x13S_PlayerRegisterAck\x12\x0e\n\x06result\x18\x01 \x01(\x08\"\'\n\x12S_PlayerUnRegister\x12\x11\n\tplayer_id\x18\x01 \x01(\t\"\'\n\x15S_PlayerUnRegisterAck\x12\x0e\n\x06result\x18\x01 \x01(\x08\x62\x06proto3')
 
 
 
 _S_GAMEHELLO = DESCRIPTOR.message_types_by_name['S_GameHello']
 _S_GAMEHELLOACK = DESCRIPTOR.message_types_by_name['S_GameHelloAck']
+_S_PLAYERREGISTER = DESCRIPTOR.message_types_by_name['S_PlayerRegister']
+_S_PLAYERREGISTERACK = DESCRIPTOR.message_types_by_name['S_PlayerRegisterAck']
+_S_PLAYERUNREGISTER = DESCRIPTOR.message_types_by_name['S_PlayerUnRegister']
+_S_PLAYERUNREGISTERACK = DESCRIPTOR.message_types_by_name['S_PlayerUnRegisterAck']
 S_GameHello = _reflection.GeneratedProtocolMessageType('S_GameHello', (_message.Message,), {
   'DESCRIPTOR' : _S_GAMEHELLO,
   '__module__' : 'Game_pb2'
@@ -34,6 +38,34 @@ S_GameHelloAck = _reflection.GeneratedProtocolMessageType('S_GameHelloAck', (_me
   })
 _sym_db.RegisterMessage(S_GameHelloAck)
 
+S_PlayerRegister = _reflection.GeneratedProtocolMessageType('S_PlayerRegister', (_message.Message,), {
+  'DESCRIPTOR' : _S_PLAYERREGISTER,
+  '__module__' : 'Game_pb2'
+  # @@protoc_insertion_point(class_scope:S_PlayerRegister)
+  })
+_sym_db.RegisterMessage(S_PlayerRegister)
+
+S_PlayerRegisterAck = _reflection.GeneratedProtocolMessageType('S_PlayerRegisterAck', (_message.Message,), {
+  'DESCRIPTOR' : _S_PLAYERREGISTERACK,
+  '__module__' : 'Game_pb2'
+  # @@protoc_insertion_point(class_scope:S_PlayerRegisterAck)
+  })
+_sym_db.RegisterMessage(S_PlayerRegisterAck)
+
+S_PlayerUnRegister = _reflection.GeneratedProtocolMessageType('S_PlayerUnRegister', (_message.Message,), {
+  'DESCRIPTOR' : _S_PLAYERUNREGISTER,
+  '__module__' : 'Game_pb2'
+  # @@protoc_insertion_point(class_scope:S_PlayerUnRegister)
+  })
+_sym_db.RegisterMessage(S_PlayerUnRegister)
+
+S_PlayerUnRegisterAck = _reflection.GeneratedProtocolMessageType('S_PlayerUnRegisterAck', (_message.Message,), {
+  'DESCRIPTOR' : _S_PLAYERUNREGISTERACK,
+  '__module__' : 'Game_pb2'
+  # @@protoc_insertion_point(class_scope:S_PlayerUnRegisterAck)
+  })
+_sym_db.RegisterMessage(S_PlayerUnRegisterAck)
+
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
@@ -41,4 +73,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _S_GAMEHELLO._serialized_end=42
   _S_GAMEHELLOACK._serialized_start=44
   _S_GAMEHELLOACK._serialized_end=78
+  _S_PLAYERREGISTER._serialized_start=80
+  _S_PLAYERREGISTER._serialized_end=141
+  _S_PLAYERREGISTERACK._serialized_start=143
+  _S_PLAYERREGISTERACK._serialized_end=180
+  _S_PLAYERUNREGISTER._serialized_start=182
+  _S_PLAYERUNREGISTER._serialized_end=221
+  _S_PLAYERUNREGISTERACK._serialized_start=223
+  _S_PLAYERUNREGISTERACK._serialized_end=262
 # @@protoc_insertion_point(module_scope)

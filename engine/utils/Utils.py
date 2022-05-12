@@ -23,9 +23,12 @@ def create_async_task(co, *args, **kwargs):
 
 def load_all_handlers(handlers_mod):
     root = importlib.import_module(handlers_mod)
-    cmd_map = {}
+    client_cmd_map = {}
     logging.info(f'Load handler in {handlers_mod}')
     for modname in root.__handlers__:
+        # 只注册以handler开头的
+        if not modname.startswith("handler"):
+            continue
         m = importlib.import_module(handlers_mod + '.' + modname)
         for k in dir(m):
             if k.startswith('Handler_'):
@@ -33,10 +36,24 @@ def load_all_handlers(handlers_mod):
                 cb = f
                 if asyncio.iscoroutinefunction(f):
                     cb = functools.partial(create_async_task, cb)
-                assert (f.__name__[8:] not in cmd_map.keys())
-                cmd_map[f.__name__[8:]] = cb
-    logging.info(f'Loading finish with {len(cmd_map)} methods')
-    return cmd_map
+                assert (f.__name__[8:] not in client_cmd_map.keys())
+                client_cmd_map[f.__name__[8:]] = cb
+    sever_cmd_map = {}
+    for modname in root.__shandlers__:
+        # 只注册以s_handler开头的
+        if not modname.startswith("s_handler"):
+            continue
+        m = importlib.import_module(handlers_mod + '.' + modname)
+        for k in dir(m):
+            if k.startswith('Handler_'):
+                f = getattr(m, k)
+                cb = f
+                if asyncio.iscoroutinefunction(f):
+                    cb = functools.partial(create_async_task, cb)
+                assert (f.__name__[8:] not in sever_cmd_map.keys())
+                sever_cmd_map[f.__name__[8:]] = cb
+    logging.info(f'Loaded client {len(client_cmd_map)} methods, sever {len(sever_cmd_map)} methods')
+    return client_cmd_map, sever_cmd_map
 
 
 def check_async_cb(cb):

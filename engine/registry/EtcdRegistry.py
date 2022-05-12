@@ -7,7 +7,7 @@ from aioetcd3.help import range_prefix
 import asyncio
 from aioetcd3.watch import Event, EVENT_TYPE_DELETE
 from contextlib import suppress
-
+import time
 
 # use aioetcd3   https://github.com/gaopeiliang/aioetcd3
 
@@ -22,6 +22,7 @@ class EtcdRegistry:
         self.watched_tasks = []
         self.srv_inst = None
         self.status = False
+        self.last_etcd_tick_time = 0
 
     async def init(self, srv_inst):
         self.srv_inst = srv_inst
@@ -45,23 +46,27 @@ class EtcdRegistry:
         else:
             logging.error(f"register_server etcd error")
 
+    def get_server_by_type(self, server_type):
+        lst = list(self.online_servers.get(server_type, {}).keys())
+        return lst
+
     def get_type_key(self, server_type):
         return '/' + self.etcd_group + '/servers/' + str(server_type) + '/'
 
     def add_watches(self, type_lst):
         self.watch_types.update(type_lst)
+        for server_type in self.watch_types:
+            self.online_servers[server_type] = dict()
 
     async def watch_servers(self):
         if not self.status:
             return
         logging.info(f"start watch types:{self.watch_types}")
         for server_type in self.watch_types:
-            await self.update_servers_by_type(server_type)
-
-        for server_type in self.watch_types:
-            self.online_servers[server_type] = dict()
             wt = asyncio.create_task(self.watch_node(self.get_type_key(server_type)))
             self.watched_tasks.append(wt)
+        for server_type in self.watch_types:
+            await self.update_servers_by_type(server_type)
 
     async def watch_node(self, node):
         logging.info(f"start watch etcd node:{node}")
@@ -142,6 +147,18 @@ class EtcdRegistry:
         except Exception as e:
             logging.error(f'error when clean etcd: {e}')
 
-    async def server_heartbeat(self):
-        pass
+    async def tick(self):
+        logging.info(f"etcd tick,self.online_server:{self.online_servers}")
+        if self.srv_inst.exited:
+            return
+        if self.etcd_lease_ttl is None:
+            return
+        try:
+            if await self.aio_etcd.refresh_lease(self.etcd_lease):
+                self.last_etcd_tick_time = time.time()
+        except Exception as e:
+            logging.error(f'etcd tick error: {e}')
+        finally:
+            if time.time() - self.last_etcd_tick_time > self.etcd_lease_ttl:
+                logging.critical("server in etcd out of data ")
 
