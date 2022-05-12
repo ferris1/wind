@@ -43,7 +43,7 @@ git clone https://github.com/ferris1/wind.git
 
 - **启动分布式服务**
 
-启动分布式服务时需要保证运行Etcd服和Nats服，具体运行考参考官网，要不然各个服务不能合作运行。
+启动分布式服务时需要保证运行Etcd服和Nats服，具体运行参考官网，要不然各个服务不能合作运行。
 
 在script下运行 `start_all.bat` 启动所有服务，目前只有两类服务，一个是Gateway服务，用于消息路由，一个是Game服务，用于处理游戏逻辑。
 
