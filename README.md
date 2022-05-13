@@ -50,48 +50,6 @@ git clone https://github.com/ferris1/wind.git
 
 Wind只是分布式服务器引擎，最终的分布式服务框架还需要你自己设计，具体可以参考这边文章[从服务器发展史看现代游戏服务器架构](https://zhuanlan.zhihu.com/p/500840594)
 
-# Wind使用
-
-Wind服务客户端请求非常简单，只需要两步。
-
-- **协议定义**
-
-目前客户端通信支持Protobuf协议编码，在`engine\codec\proto\rpc_client`加与客户端通信的接口，比如加以下接口。
-
-```protobuf
-message PlayerLoginRequest
-{
-    string player_id = 1;
-}
-
-message PlayerLoginResponse
-{
-    string player_id = 1;
-    bool result = 2;
-}
-```
-
-- **RPC函数**
-
-然后你只需要在对应服务的`handlers`目录下编写RPC函数，服务器启动时会自动注册RPC函数，然后就可以服务客户端请求了，比如Gateway服务下的`handler_player`
-
-```python
-
-import logging
-from engine.codec.proto_importer import PlayerLoginResponse
-from engine.client.ClientMgr import ClientConn
-
-# 客户端rpc函数以Handler开头,后面接对应协议的函数名
-async def Handler_PlayerLoginRequest(client: ClientConn, request):
-    logging.info(f"player_id:{client}, request:{request} ")
-    client.set_player_id(request.player_id)
-    pck = PlayerLoginResponse()
-    pck.player_id = request.player_id
-    pck.result = True
-    client.send_packet(pck)
-```
-# Example
-目前有个Python的小客户端
 
 
 # 文档
