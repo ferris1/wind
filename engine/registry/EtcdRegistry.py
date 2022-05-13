@@ -148,7 +148,7 @@ class EtcdRegistry:
             logging.error(f'error when clean etcd: {e}')
 
     async def tick(self):
-        logging.info(f"etcd tick,self.online_server:{self.online_servers}")
+        # logging.info(f"etcd tick,self.online_server:{self.online_servers}")
         if self.srv_inst.exited:
             return
         if self.etcd_lease_ttl is None:

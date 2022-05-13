@@ -158,10 +158,10 @@ class Engine:
         return info
 
     def on_server_del(self, info):
-        logging.error(f"on_server_del.info:{info} ")
+        logging.info(f"on_server_del.info:{info} ")
 
     def on_server_add(self, info):
-        logging.error(f"on_server_add.info:{info} ")
+        logging.info(f"on_server_add.info:{info} ")
 
     # 一般为了节省内部流量 服务器内部消息头不加pid
     def send_server_message(self, server_type, server_id, pid, pck):

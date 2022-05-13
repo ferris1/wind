@@ -1,7 +1,7 @@
 
 import sys, logging, logging.handlers
 from pathlib import Path
-
+import coloredlogs
 
 def init_log(srv):
     file_name = f'{srv.name}.{((str(sys.argv[1])) if len(sys.argv) > 1 else "")}'
@@ -18,10 +18,11 @@ def set_log(name="test", to_console=True, to_file=True, file_name=""):
     logging.getLogger().handlers.clear()
 
     if to_console:
-        c_handle = logging.StreamHandler()
-        c_handle.setLevel(log_level)
-        c_handle.setFormatter(formatter)
-        logging.getLogger().addHandler(c_handle)
+        coloredlogs.install(level=log_level, fmt=format_str)
+        # c_handle = logging.StreamHandler()
+        # c_handle.setLevel(log_level)
+        # c_handle.setFormatter(formatter)
+        # logging.getLogger().addHandler(c_handle)
 
     if to_file and file_name is not None:
         file_out = log_dir + "/" + file_name + '.log'
