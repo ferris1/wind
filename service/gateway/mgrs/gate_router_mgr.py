@@ -42,6 +42,7 @@ class GateRouterMgr(Singleton):
                 logging.error("No Game Server to Bind")
                 return
             self.player2server[player_id] = bind_server
+            logging.warning(f"player_id:{player_id} bind game:{bind_server} success ")
         sync = S_PlayerRegister()
         sync.player_id = player_id
         sync.gate_server_id = SrvEngine.srv_inst.server_id
