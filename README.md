@@ -73,7 +73,7 @@ message PlayerLoginResponse
 
 - **RPC函数**
 
-然后你只需要在对应服务的`handlers_client`目录下编写RPC函数，服务器启动时会自动注册RPC函数，然后就可以服务客户端请求了，比如Gateway服务下的`handler_player`
+然后你只需要在对应服务的`handlers`目录下编写RPC函数，服务器启动时会自动注册RPC函数，然后就可以服务客户端请求了，比如Gateway服务下的`handler_player`
 
 ```python
 
