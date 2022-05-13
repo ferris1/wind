@@ -56,7 +56,7 @@ Wind服务客户端请求非常简单，只需要两步。
 
 - **协议定义**
 
-目前客户端通信支持Protobuf协议编码，在engine\codec\proto\rpc_client加与客户端通信的接口，比如加以下接口。
+目前客户端通信支持Protobuf协议编码，在`engine\codec\proto\rpc_client`加与客户端通信的接口，比如加以下接口。
 
 ```protobuf
 message PlayerLoginRequest
