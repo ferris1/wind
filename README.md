@@ -56,4 +56,4 @@ Wind只是分布式服务器引擎，最终的分布式服务框架还需要你�
 
 [Wind文档](https://ferris1.gitbook.io/wind-yi-kuan-mian-xiang-yun-de-fen-bu-shi-you-xi-fu-wu-qi-yin-qing/)
 
-[Wind设计文章](https://ferris1.gitbook.io/wind-yi-kuan-mian-xiang-yun-de-fen-bu-shi-you-xi-fu-wu-qi-yin-qing/)
+[Wind设计文章](https://zhuanlan.zhihu.com/p/514321106/preview?comment=0&catalog=0)
