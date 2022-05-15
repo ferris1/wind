@@ -25,7 +25,7 @@ class WindNetwork:
         self.net_status = False
         self.net_transport = None
 
-    async def start_net_thread(self, ip, port, net_connect_callback, net_disconnect_callback, net_packet_callback):
+    async def start_net_worker(self, ip, port, net_connect_callback, net_disconnect_callback, net_packet_callback):
         self.on_connect_callback = check_async_cb(net_connect_callback)
         self.on_disconnect_callback = check_async_cb(net_disconnect_callback)
         self.on_packet_callback = check_async_cb(net_packet_callback)
@@ -67,7 +67,6 @@ class NetProtocol(asyncio.Protocol):
     def data_received(self, data):
         index = 0
         # 这里是TCP流，有可能多个包粘合在一起，所以这里拆一下包
-
         while index < len(data):
             mess, index = MsgPack().unpack(data, index)
             if mess.cmd_id == ServerCmdEnum.CmdInit.value:

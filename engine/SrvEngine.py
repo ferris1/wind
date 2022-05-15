@@ -70,12 +70,13 @@ class Engine:
     async def exit(self):
         pass
 
+    # 服务启动主要流程都在这里
     async def launch(self):
-        # 配置参数
+        #服务参数配置  组件的初始化
         await self.init()
-        # 注册rpc处理函数
+        # 注册客户端与服务器rpc处理函数以及注册服务信息到etcd
         await self.register()
-        # 启动前最后做一些逻辑操作等
+        # 启动前最后做一些逻辑操作，比如一些启用一些定时任务
         await self.start()
         logging.critical(f"################ 服务 {self.name} 启动完毕 ##############")
         logging.info("服务端口号:{}".format(self.port))

@@ -31,6 +31,7 @@ func (mh *MsgHandle) SendMsgToTaskQueue(request IRequest) {
 	mh.TaskQueue <- request
 }
 
+// 这里应该开两个线程  一个处理客户端数据  一个处理Python端数据
 func (mh *MsgHandle) StartNetWorker()  {
 	for {
 		select {
@@ -43,7 +44,7 @@ func (mh *MsgHandle) StartNetWorker()  {
 		}
 	}
 }
-
+//处理客户端的数据
 func (mh *MsgHandle) DoMsgHandler(request IRequest) {
 	pyConn,err := mh.Server.GetConnMgr().Get(PyConnId)
 	if err != nil {
@@ -69,6 +70,7 @@ func (mh *MsgHandle) DoMsgHandler(request IRequest) {
 	}
 }
 
+//处理Python端的数据
 func (mh *MsgHandle) DoPyMsgHandler(request IRequest) {
 	//pyConn := request.GetConnection()
 	switch ServerCmdEnum(request.GetCmdID()) {

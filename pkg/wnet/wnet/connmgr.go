@@ -44,7 +44,7 @@ func (connMgr *ConnManager) Get(connID uint32) (IConnection, error) {
 		return conn, nil
 	}
 
-	return nil, errors.New("connection not found")
+	return nil, errors.New("no connection")
 }
 
 func (connMgr *ConnManager) Len() int32 {

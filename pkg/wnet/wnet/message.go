@@ -39,9 +39,6 @@ func NewPyMessage(CmdId uint32,PeerId uint32,ID uint32, data []byte) IMessage {
 	}
 }
 
-func (msg *Message) GetDataLen() uint32 {
-	return msg.DataLen
-}
 
 func (msg *Message) GetMsgID() uint32 {
 	return msg.MsgID
@@ -53,6 +50,10 @@ func (msg *Message) GetCmdID() uint32 {
 
 func (msg *Message) GetPeerID() uint32 {
 	return msg.PeerId
+}
+
+func (msg *Message) GetDataLen() uint32 {
+	return msg.DataLen
 }
 
 func (msg *Message) GetData() []byte {
@@ -67,13 +68,14 @@ func (msg *Message) SetMsgID(msgID uint32) {
 	msg.MsgID = msgID
 }
 
+func (msg *Message) SetCmdID(CmdId uint32) {
+	msg.CmdId = CmdId
+}
+
 func (msg *Message) SetData(data []byte) {
 	msg.Data = data
 }
 
-func (msg *Message) SetCmdID(CmdId uint32) {
-	msg.CmdId = CmdId
-}
 
 func (msg *Message) SetPeerID(peerId uint32) {
 	msg.PeerId = peerId

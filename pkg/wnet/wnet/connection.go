@@ -60,19 +60,19 @@ func (c *Connection) StartReader() {
 		default:
 			headData := make([]byte, c.Server.Packet().GetHeadLen())
 			if _, err := io.ReadFull(c.Conn, headData); err != nil {
-				NetLog.Erorr("read client msg head error: ", err)
+				NetLog.Erorr("read packet head error: ", err)
 				return
 			}
 			msg, err := c.Server.Packet().Unpack(headData)
 			if err != nil {
-				NetLog.Erorr("unpack error ", err)
+				NetLog.Erorr("unpack packet error ", err)
 				return
 			}
 			var data []byte
 			if msg.GetDataLen() > 0 {
 				data = make([]byte, msg.GetDataLen())
 				if _, err := io.ReadFull(c.Conn, data); err != nil {
-					NetLog.Erorr("read msg data error ", err)
+					NetLog.Erorr("read packet data error ", err)
 					return
 				}
 			}
@@ -96,19 +96,19 @@ func (c *Connection) StartPyReader() {
 		default:
 			headData := make([]byte, c.Server.Packet().GetPyHeadLen())
 			if _, err := io.ReadFull(c.Conn, headData); err != nil {
-				NetLog.Erorr("read msg head error ", err)
+				NetLog.Erorr("read packet head error ", err)
 				return
 			}
 			msg, err := c.Server.Packet().UnpackPy(headData)
 			if err != nil {
-				NetLog.Erorr("unpack error: ", err)
+				NetLog.Erorr("unpack packet error: ", err)
 				return
 			}
 			var data []byte
 			if msg.GetDataLen() > 0 {
 				data = make([]byte, msg.GetDataLen())
 				if _, err := io.ReadFull(c.Conn, data); err != nil {
-					NetLog.Erorr("read msg data error ", err)
+					NetLog.Erorr("read packet data error ", err)
 					return
 				}
 			}
@@ -126,7 +126,7 @@ func (c *Connection) SendMsg(msgID uint32, data []byte) error {
 	c.RLock()
 	defer c.RUnlock()
 	if c.isClosed == true {
-		return errors.New("connection closed when send msg")
+		return errors.New("connection closed")
 	}
 
 	dp := c.Server.Packet()
@@ -159,19 +159,19 @@ func (c *Connection) SendPyMsg(cmdID uint32, PeerId uint32, msgID uint32, data [
 func (c *Connection) ReadFromPy() IMessage {
 	headData := make([]byte, c.Server.Packet().GetPyHeadLen())
 	if _, err := io.ReadFull(c.Conn, headData); err != nil {
-		NetLog.Erorr("read msg head error ", err)
+		NetLog.Erorr("read py msg head error ", err)
 		return nil
 	}
 	msg, err := c.Server.Packet().UnpackPy(headData)
 	if err != nil {
-		NetLog.Erorr("unpack error ", err)
+		NetLog.Erorr("unpack py msg error ", err)
 		return nil
 	}
 	var data []byte
 	if msg.GetDataLen() > 0 {
 		data = make([]byte, msg.GetDataLen())
 		if _, err := io.ReadFull(c.Conn, data); err != nil {
-			NetLog.Erorr("read msg data error ", err)
+			NetLog.Erorr("read py msg data error ", err)
 			return nil
 		}
 	}
@@ -194,6 +194,7 @@ func (c *Connection) Start() {
 	}
 }
 
+// 新连接建立后 通知Python端 有客户端连接过来
 func (c *Connection) SendConnectToPy() {
 	msg:= NewMessage(uint32(CmdConnect),0,[]byte(""))
 	req := Request{

@@ -59,8 +59,8 @@ class ClientMgr(Singleton):
     async def init(self, ip, port):
         logging.info("ClientMgr init ")
         self.wind_net = WindNetwork()
-        await self.wind_net.start_net_thread(ip, port, self.on_net_connect, self.on_net_disconnect, self.on_net_data)
-
+        await self.wind_net.start_net_worker(ip, port, self.on_net_connect, self.on_net_disconnect, self.on_net_data)
+    # 与客户端的数据交互 使用callback的形式
     def on_net_connect(self, peer_id, address, port):
         logging.info(f"on_net_connect.peer_id:{peer_id},address:{address}, port:{port}")
         conn = self.create_conn(peer_id, address, port)

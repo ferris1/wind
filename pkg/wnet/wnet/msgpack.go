@@ -29,12 +29,12 @@ func (dp *MsgPack) GetHeadLen() uint32 {
 	return defaultHeaderLen
 }
 
-// peer_id,ctrl, dataLen
+// peer_id,cmd_id,msg_id,dataLen,data
 func (dp *MsgPack) GetPyHeadLen() uint32 {
 	return defaultPyHeaderLen
 }
 
-
+// |msg_id|len|data
 func (dp *MsgPack) Pack(msg IMessage) ([]byte, error) {
 	dataBuff := bytes.NewBuffer([]byte{})
 
@@ -69,6 +69,7 @@ func (dp *MsgPack) Unpack(binaryData []byte) (IMessage, error) {
 	return msg, nil
 }
 
+// cmd_id|peer_id|msg_id|len|data
 func (dp *MsgPack) PackPy(msg IMessage) ([]byte, error) {
 	dataBuff := bytes.NewBuffer([]byte{})
 

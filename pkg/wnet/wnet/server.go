@@ -74,10 +74,11 @@ func (s *NetServer) PyNetStart() {
 		}
 		pymsg := pyConn.ReadFromPy()
 		if pymsg != nil && ServerCmdEnum(pymsg.GetCmdID()) == CmdInit {
-			NetLog.Info("PyNetStart finish")
+			NetLog.Info("Py Net init finish")
 			break
 		}
 	}
+	// 开始Python端的数据读取
 	go pyConn.Start()
 }
 
@@ -97,7 +98,7 @@ func (s *NetServer) TcpStart() {
 			NetLog.Erorr("Accept err ", err)
 			continue
 		}
-		NetLog.Info("Get conn remote addr = ", conn.RemoteAddr().String())
+		NetLog.Info("client conn start connect. remote addr = ", conn.RemoteAddr().String())
 		if s.ConnMgr.Len() >= MaxConn {
 			_ = conn.Close()
 			continue

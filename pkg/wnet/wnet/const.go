@@ -15,10 +15,10 @@ const (
 )
 
 var (
-	MaxConn int32 = 50000
-	MaxPacketSize uint32 = 1024*1024*2   // 最大2M的包
-	MaxWorkerTaskLen int32 = 1000
-	PeerIDStart      uint32 = 1000
-	PyConnId         uint32 = 10
-	DDMMYYYYhhmmss = "2006-01-02 15:04:05,972"
+	MaxConn 			int32 = 50000
+	MaxPacketSize 		uint32 = 1024*1024*2   // 最大2M的包
+	MaxWorkerTaskLen 	int32 = 1000
+	PeerIDStart      	uint32 = 1000
+	PyConnId         	uint32 = 10
+	DDMMYYYYhhmmss 		= "2006-01-02 15:04:05,972"
 )

@@ -1,7 +1,7 @@
 
 from enum import IntEnum
 
-
+# Python与Go的交互命令
 class ServerCmdEnum(IntEnum):
     CmdNone = 0
     CmdInit = 1
