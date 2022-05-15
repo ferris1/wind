@@ -37,12 +37,15 @@ class GateRouterMgr(Singleton):
         # 先绑定下服务器
         bind_server = self.player2server.get(SeverType.GAME)
         if not bind_server:
+            # 由select随机选取一个game服务
             bind_server = SrvEngine.srv_inst.selector.random_choose(SeverType.GAME)
             if not bind_server:
                 logging.error("No Game Server to Bind")
                 return
+            # 绑定Game服务
             self.player2server[player_id] = bind_server
             logging.warning(f"player_id:{player_id} bind game:{bind_server} success ")
+        # 发服务器的RPC到Game服务，告诉Game服务有人注册了。
         sync = S_PlayerRegister()
         sync.player_id = player_id
         sync.gate_server_id = SrvEngine.srv_inst.server_id
