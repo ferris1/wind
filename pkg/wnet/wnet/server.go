@@ -41,7 +41,7 @@ func NewNetServer() *NetServer {
 	s.MsgHandler.SetServer(s)
 	return s
 }
-
+// Python端调用的接口
 //export StartNetThread
 func StartNetThread(netPyAddr *C.char, ip *C.char,name *C.char, port int)  {
 	s := NewNetServer()

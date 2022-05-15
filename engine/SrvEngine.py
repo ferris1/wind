@@ -16,6 +16,7 @@ from engine.config import Config
 # python 3.9.12
 
 
+# Wind的核心类,engine目录下所有的组件都是附加到Engine类的
 class Engine:
     def __init__(self, name: str, typ, process_pool: int = None) -> None:
         self.exited = False
@@ -61,7 +62,7 @@ class Engine:
         self.register_client_cmd(client_cmd)
         await self.registry.register(self.server_id, self.server_type)
         await self.broker.subscribe()
-        self.add_timer(self.registry.tick, int(Config.ETCD_TTL / 2))
+        self.add_timer(int(Config.ETCD_TTL / 2), self.registry.tick)
 
     async def start(self):
         await self.registry.watch_servers()
@@ -134,7 +135,7 @@ class Engine:
             logging.error(f"no rpc func:{cmd}")
 
     # 定时函数
-    def add_timer(self, func=None, interval=60, *args, **kwargs):
+    def add_timer(self, interval=60, func=None, *args, **kwargs):
         if func is None or self.exited:
             return
 

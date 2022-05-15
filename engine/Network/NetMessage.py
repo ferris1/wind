@@ -31,6 +31,7 @@ class MsgPack(Singleton):
         data += mess.data
         return data
 
+    # | cmd_id | peer_id | msg_id | data_len | data|
     def unpack(self, data, index):
         mess = Message()
         mess.cmd_id = uint_from_bytes(data[index:index+4])

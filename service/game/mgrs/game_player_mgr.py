@@ -6,9 +6,6 @@ from engine.utils.Const import SeverType
 
 class GamePlayerMgr(Singleton):
     def __init__(self):
-        # 绑定Gate服
-        # 一般服务器的绑定信息放到redis里  因为每个玩家每类服务器只绑定一个，同时会有多个服务器访问绑定信息 所以放redis里面比较合理
-        # 这里为了减少冗余代码，所以每个服有一份绑定信息，如果你要用的话，建议放到redis中
         self.player2server = {}
 
     def get_player_bind_server(self, player_id):

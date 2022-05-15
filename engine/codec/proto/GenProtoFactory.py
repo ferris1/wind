@@ -166,4 +166,4 @@ if __name__ == '__main__':
     gen_proto_py('../gen/rpc_server/factory_server.py')
     print('success export factory_server.factory_server')
 
-    gen_proto_cs('../../../sdks/csharp/GenProtoFactory.cs', 'ProtoFactoryPb')
+    gen_proto_cs('../../../sdks/unity/GenProtoFactory.cs', 'ProtoFactoryPb')

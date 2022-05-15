@@ -29,7 +29,8 @@ class EtcdRegistry:
         try:
             await self.aio_etcd.status()
         except Exception as ex:
-            logging.error("no etcd valid server")
+            logging.error("no etcd server. please launch etcd server first. see "
+                          "https://etcd.io/docs/v3.4/install/")
             self.status = False
         else:
             self.status = True
@@ -149,7 +150,7 @@ class EtcdRegistry:
 
     async def tick(self):
         # logging.info(f"etcd tick,self.online_server:{self.online_servers}")
-        if self.srv_inst.exited:
+        if self.srv_inst.exited or not self.status:
             return
         if self.etcd_lease_ttl is None:
             return

@@ -62,9 +62,12 @@ class NetProtocol(asyncio.Protocol):
         self.net.net_transport = transport
         logging.info(f"connection_made.transport:{self.transport} ")
 
+    # 接收go发过来的数据报格式如下
+    # | cmd_id | peer_id | msg_id | data_len | data |
     def data_received(self, data):
         index = 0
         # 这里是TCP流，有可能多个包粘合在一起，所以这里拆一下包
+
         while index < len(data):
             mess, index = MsgPack().unpack(data, index)
             if mess.cmd_id == ServerCmdEnum.CmdInit.value:

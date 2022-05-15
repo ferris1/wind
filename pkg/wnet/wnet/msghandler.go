@@ -58,15 +58,12 @@ func (mh *MsgHandle) DoMsgHandler(request IRequest) {
 			break
 		}
 		intPort,err := strconv.Atoi(port)
-		//NetLog.Info("SendPyMsg.CmdConnect ",request.GetData())
 		_ = pyConn.SendPyMsg(uint32(CmdConnect), conn.GetPeerID(), uint32(intPort), []byte(ip))
 		break
 	case CmdDisconnect:
-		//NetLog.Info("SendPyMsg.CmdDisconnect ",request.GetData())
 		_ = pyConn.SendPyMsg(uint32(CmdDisconnect), conn.GetPeerID(), request.GetMsgID(), request.GetData())
 		break
 	default: // 默认直接发给python端
-		//NetLog.Info("SendPyMsg.CmdPacket ",request.GetData())
 		_ = pyConn.SendPyMsg(uint32(CmdPacket), conn.GetPeerID(), request.GetMsgID(), request.GetData())
 		break
 	}

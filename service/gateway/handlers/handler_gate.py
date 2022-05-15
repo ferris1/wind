@@ -9,7 +9,7 @@ async def Handler_HeartbeatRequest(client: ClientConn, request):
     logging.info(f"receive client:{client.peer_id} Heartbeat")
 
 
-# 客户端rpc函数以Handler开头
+# 客户端rpc函数以Handler_开头 后面接Protobuf的协议名
 async def Handler_PlayerLoginRequest(client: ClientConn, request):
     logging.info(f"player_id:{client}, request:{request} ")
     client.set_player_id(request.player_id)
