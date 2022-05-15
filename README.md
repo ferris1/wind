@@ -27,7 +27,7 @@
 
 - **安装Python**
 
-Wind默认在Windows平台下开发，支持Linux下Docker部署。Wind业务逻辑使用Python编写，Golang编译成动态库供Python调用，运行前需要安装Python版本，我的Python版本是3.9，支持Python3.7+。
+Wind默认在Windows平台下开发，支持Linux下Docker部署。Wind业务逻辑使用Python编写，Golang编译成动态库供Python调用，运行前需要安装Python版本，支持Python3.7+。
 
 Wind使用Etcd做服务发现功能，使用Nats做分布式消息队列，所以需要安装对应Python客户端库。在script目录下运行 **`install_python_requirements.bat`**  安装对应Python库。
 
