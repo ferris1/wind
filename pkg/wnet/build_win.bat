@@ -1,2 +1,2 @@
-go build -o ../builds/wnet.dll -buildmode=c-shared ./
+go build -o ../../builds/wnet.dll -buildmode=c-shared ./
 pause
