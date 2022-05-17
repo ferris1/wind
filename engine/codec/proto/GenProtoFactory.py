@@ -158,12 +158,12 @@ def gen_proto_cs(out_path, class_name):
 
 if __name__ == '__main__':
     # protoc 3.20 不在直接生成协议对线 改成动态生成了
-    load_meta('rpc_client', 'menu.txt')
-    gen_proto_py('../gen/rpc_client/factory_client.py')
+    load_meta('../engine/codec/proto/rpc_client', 'menu.txt')
+    gen_proto_py('../engine/codec/gen/rpc_client/factory_client.py')
     print('success export gen_proto_factory.rpc_client')
 
-    load_meta('rpc_server', 'menu.txt')
-    gen_proto_py('../gen/rpc_server/factory_server.py')
+    load_meta('../engine/codec/proto/rpc_server', 'menu.txt')
+    gen_proto_py('../engine/codec/gen/rpc_server/factory_server.py')
     print('success export factory_server.factory_server')
 
-    gen_proto_cs('../../../sdks/unity/GenProtoFactory.cs', 'ProtoFactoryPb')
+    gen_proto_cs('../sdks/unity/GenProtoFactory.cs', 'ProtoFactoryPb')
