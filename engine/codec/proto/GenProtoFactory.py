@@ -14,32 +14,28 @@ proto_name2type = dict()
 '''
 
 CS_PROTO_FACTORY_TEMPLATE = '''
+// do not edit. gen by server codec
 using System;
 using System.Collections.Generic;
 using Google.Protobuf;
 
-namespace NetworkCodec
+namespace WindNetwork
 {
 	public partial class {class_name}
 	{
-		public static IMessage GetProtoObj(int proto_id)
+		public static IMessage GetProtoObj(int protoId)
 		{
-			switch (proto_id)
+			switch (protoId)
 			{
 {ori_class_statement}
 			}
 			return null;
 		}
 
-		public static IMessage GetProtoObj(byte[] _buf, ref int idx, out int proto_id)
+		public static IMessage DecodeProtoData(byte[] dataBytes, int protoId)
 		{
-			proto_id = Misc.short_from_bytes_le(_buf, ref idx);
-			int data_size = Misc.int_from_bytes_le(_buf, ref idx);
-			var data_sequence = new byte[data_size];
-			Array.Copy(_buf, idx, data_sequence, 0, data_sequence.Length);
-			idx += data_size;
 			IMessage ret;
-			switch (proto_id)
+			switch (protoId)
 			{
 {class_id_statement}
 			}
@@ -129,14 +125,14 @@ def gen_proto_cs(out_path, class_name):
     output_ori = io.StringIO()
 
     for (k, v) in method_to_id.items():
-
         if k.endswith('Response'):
+
             output_parse.write("\t\t\t\tcase {}:\n".format(v))
-            output_parse.write("\t\t\t\t\tret = {}.Parser.ParseFrom(data_sequence);\n".format(k))
+            output_parse.write("\t\t\t\t\tret = {}.Parser.ParseFrom(dataBytes);\n".format(k))
             output_parse.write("\t\t\t\t\treturn ret;\n")
 
             output_call.write("\t\t\t\tcase {}:\n".format(v))
-            output_call.write("\t\t\t\t\tServerRpcImplement.On_{0}(({0})m);\n".format(k))
+            output_call.write("\t\t\t\t\tWindHandler.On_{0}(({0})m);\n".format(k))
             output_call.write("\t\t\t\tbreak;\n")
             output_ori.write("\t\t\t\tcase {}:\n".format(v))
             output_ori.write("\t\t\t\t\tvar res{} = new {}();\n".format(v, k))
@@ -157,13 +153,15 @@ def gen_proto_cs(out_path, class_name):
 
 
 if __name__ == '__main__':
-    # protoc 3.20 不在直接生成协议对线 改成动态生成了
+    # protoc 3.20 不在直接生成协议兑对象了 改成动态生成了
+    # 这里使用
     load_meta('../engine/codec/proto/rpc_client', 'menu.txt')
     gen_proto_py('../engine/codec/gen/rpc_client/factory_client.py')
-    print('success export gen_proto_factory.rpc_client')
+
+    gen_proto_cs('../sdks/unity/ProtoGen/GenProtoFactory.cs', 'ProtoFactoryPb')
+    print('success gen gen_proto_factory.rpc_client')
 
     load_meta('../engine/codec/proto/rpc_server', 'menu.txt')
     gen_proto_py('../engine/codec/gen/rpc_server/factory_server.py')
-    print('success export factory_server.factory_server')
+    print('success gen factory_server.factory_server')
 
-    gen_proto_cs('../sdks/unity/GenProtoFactory.cs', 'ProtoFactoryPb')

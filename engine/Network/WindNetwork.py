@@ -64,9 +64,11 @@ class NetProtocol(asyncio.Protocol):
 
     # 接收go发过来的数据报格式如下
     # | cmd_id | peer_id | msg_id | data_len | data |
+
     def data_received(self, data):
         index = 0
         # 这里是TCP流，有可能多个包粘合在一起，所以这里拆一下包
+        # TODO: 这里有可能发过来来的是不全的包, 需要判断下是不是完整的包
         while index < len(data):
             mess, index = MsgPack().unpack(data, index)
             if mess.cmd_id == ServerCmdEnum.CmdInit.value:
