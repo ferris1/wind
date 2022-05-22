@@ -115,6 +115,9 @@ class Engine:
         else:
             logging.error(f"no rpc func:{cmd}")
 
+    def on_client_disconect(self, player_id):
+        pass
+
     def send_response_client(self, pid, pck):
         logging.info("由外部服务继承，并重写方法")
 
@@ -167,9 +170,9 @@ class Engine:
 
     # 一般为了节省内部流量 服务器内部消息头不加pid
     def send_server_message(self, server_type, server_id, pid, pck):
-        cmd = pck.DESCRIPTOR.full_name
-        data = BrokerPack().pack(pid, cmd, pck)
-        logging.info(f"send server_type:{server_type}, server_id:{server_id}, pck:{pck}")
+
+        data = BrokerPack().pack(pid, pck.DESCRIPTOR.name, pck)
+        d_pid,d_cmd,d_pck = BrokerPack().unpack(data)
         if server_id == "*":
             self.loop.create_task(self.broker.send_to_group_server(server_type, data))
         elif server_id is not None and server_id != "":

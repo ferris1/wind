@@ -55,7 +55,7 @@ class EchoClientProtocol(asyncio.Protocol):
 
 
 def send_pack(transport, pck):
-    msg_id = CodecMgr().get_proto_id(pck.DESCRIPTOR.full_name)
+    msg_id = CodecMgr().get_proto_id(pck.DESCRIPTOR.name)
     mess = ClientMessage()
     mess.msg_id = msg_id
     mess.data = CodecMgr().encode(pck)

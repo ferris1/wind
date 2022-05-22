@@ -24,19 +24,19 @@ namespace WindNetwork
 
         private readonly Thread thread;
 
-        // ¿Í»§¶ËÇëÇó¶ÓÁÐ
+        // ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         private ConcurrentQueue<ClientRequest> RequestQue;
-        // ·þÎñÆ÷ÏûÏ¢¶ÓÁÐ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½
         private ConcurrentQueue<ServerMessage> MessageQue;
 
-        // ¿Í»§¶ËÇëÇó
+        // ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         public delegate bool RequestFunc(object o);
         private sealed class ClientRequest
         {
             public RequestFunc RequestFunc = null;
             public object Data;
         }
-        // ·þÎñÆ÷´¦Àíº¯Êý
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         public delegate void HandlerFunc(object o);
         class ServerMessage
         {
@@ -119,7 +119,7 @@ namespace WindNetwork
             RequestQue.Enqueue(req);
         }
         
-        // ÍøÂçÏß³Ì  ´¦Àí·¢ËÍÊý¾ÝÓë½ÓÊÜÊý¾Ý
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         private void RequestThread()
         {
             Thread.CurrentThread.Name = "Network";
@@ -127,7 +127,7 @@ namespace WindNetwork
             {
                 try
                 {
-                    // ´¦Àí·¢ËÍµÄÊý¾Ý
+                    // ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½
                     ClientRequest request;
                     while (RequestQue.TryDequeue(out request))
                     {
@@ -137,7 +137,7 @@ namespace WindNetwork
                         }
 
                     }
-                    // ´¦Àí½ÓÊÜÊý¾Ý
+                    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                     if (tcp != null)
                     {
                         lock (connectionLock)
@@ -162,7 +162,7 @@ namespace WindNetwork
             MessageQue.Enqueue(msg);
         }
 
-        // Ö÷Ïß³Ìµ÷ÓÃ£¬ÍøÂçÏß³ÌµÄ°ü»á»Øµ÷µ½Ö÷ÏßÏß³Ì
+        // ï¿½ï¿½ï¿½ß³Ìµï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ÌµÄ°ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½
         public void NetUpdate()
         {
             ServerMessage msg;
@@ -188,7 +188,7 @@ namespace WindNetwork
         {
             Debug.Log($"OnConnectCallback succ: {succ}");
             if(succ)
-                GameMgr.inst.OnNetConnect();
+                GameMgr.inst.OnNetConnect(succ);
         }
 
         public void OnDisconnectCallback()

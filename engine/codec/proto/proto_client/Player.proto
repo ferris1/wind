@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-
+package  WindNetwork;
 message PlayerLoginRequest
 {
     string player_id = 1;
@@ -39,4 +39,5 @@ message SpeakOnWorldResponse
     string name = 2;
     string content = 3;
 }
+
 

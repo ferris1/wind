@@ -21,6 +21,12 @@ namespace WindNetwork
 				case 1006:
 					var res1006 = new SpeakOnWorldResponse();
 					return res1006;
+				case 1104:
+					var res1104 = new PlayerMoveResponse();
+					return res1104;
+				case 1106:
+					var res1106 = new PlayerJoinRoomResponse();
+					return res1106;
 
 			}
 			return null;
@@ -40,6 +46,12 @@ namespace WindNetwork
 				case 1006:
 					ret = SpeakOnWorldResponse.Parser.ParseFrom(dataBytes);
 					return ret;
+				case 1104:
+					ret = PlayerMoveResponse.Parser.ParseFrom(dataBytes);
+					return ret;
+				case 1106:
+					ret = PlayerJoinRoomResponse.Parser.ParseFrom(dataBytes);
+					return ret;
 
 			}
 			return null;
@@ -57,6 +69,12 @@ namespace WindNetwork
 				break;
 				case 1006:
 					WindHandler.On_SpeakOnWorldResponse((SpeakOnWorldResponse)m);
+				break;
+				case 1104:
+					WindHandler.On_PlayerMoveResponse((PlayerMoveResponse)m);
+				break;
+				case 1106:
+					WindHandler.On_PlayerJoinRoomResponse((PlayerJoinRoomResponse)m);
 				break;
 
 			}
@@ -80,6 +98,18 @@ namespace WindNetwork
 					return 1005;
 				case "SpeakOnWorldResponse":
 					return 1006;
+				case "Vector3":
+					return 1101;
+				case "Vector2":
+					return 1102;
+				case "PlayerMoveRequest":
+					return 1103;
+				case "PlayerMoveResponse":
+					return 1104;
+				case "PlayerJoinRoomRequest":
+					return 1105;
+				case "PlayerJoinRoomResponse":
+					return 1106;
 
 			}
 			return 0;
@@ -91,6 +121,12 @@ namespace WindNetwork
 		public static readonly string CreateRoleResponse_NAME = "CreateRoleResponse";
 		public static readonly string SpeakOnWorldRequest_NAME = "SpeakOnWorldRequest";
 		public static readonly string SpeakOnWorldResponse_NAME = "SpeakOnWorldResponse";
+		public static readonly string Vector3_NAME = "Vector3";
+		public static readonly string Vector2_NAME = "Vector2";
+		public static readonly string PlayerMoveRequest_NAME = "PlayerMoveRequest";
+		public static readonly string PlayerMoveResponse_NAME = "PlayerMoveResponse";
+		public static readonly string PlayerJoinRoomRequest_NAME = "PlayerJoinRoomRequest";
+		public static readonly string PlayerJoinRoomResponse_NAME = "PlayerJoinRoomResponse";
 
 	}
 }

@@ -1,2 +1,0 @@
-Engine.proto = 100
-Player.proto = 1000

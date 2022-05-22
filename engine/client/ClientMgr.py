@@ -35,7 +35,7 @@ class ClientConn:
         mess.cmd_id = ServerCmdEnum.CmdSend.value
         mess.data = CodecMgr().encode(pck)
         mess.peer_id = self.peer_id
-        mess.msg_id = CodecMgr().get_proto_id(pck.DESCRIPTOR.full_name)
+        mess.msg_id = CodecMgr().get_proto_id(pck.DESCRIPTOR.name)
         raw_data = MsgPack().pack(mess)
         logging.info(f" send_packet:{mess}")
         ClientMgr().wind_net.net_send_data(raw_data)
@@ -70,8 +70,11 @@ class ClientMgr(Singleton):
 
     def on_net_disconnect(self, peer_id):
         logging.info(f"on_net_disconnect.peer_id:{peer_id}")
+        conn = self.get_client_conn_by_peer(peer_id)
+        SrvEngine.srv_inst.on_client_disconect(conn.player_id)
         self.peer_to_client.pop(peer_id, None)
         self.connect_count -= 1
+
 
     def on_net_data(self, peer_id, proto_id, proto_data_len, proto_data):
         logging.info(f"on_net_data.peer_id:{peer_id},proto_id:{proto_id}, proto_data_len:{proto_data_len}")
@@ -88,7 +91,7 @@ class ClientMgr(Singleton):
         conn.port = port
         return conn
 
-    def get_client_conn_by_peer(self, peer_id):
+    def get_client_conn_by_peer(self, peer_id) -> ClientConn:
         return self.peer_to_client.get(peer_id)
 
     def get_client_by_player_id(self, player_id) -> ClientConn:

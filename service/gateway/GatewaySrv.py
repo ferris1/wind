@@ -34,6 +34,9 @@ class GatewaySrv(Engine):
         else:
             await super(GatewaySrv, self).on_client_request(client, cmd, request)
 
+    def on_client_disconect(self, player_id):
+        GateRouterMgr().on_player_leave(player_id)
+
     def send_response_client(self, pid, pck):
         if not self.is_external:
             logging.error("not external, can not send response to client")

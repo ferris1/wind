@@ -1,6 +1,6 @@
 from engine.utils.Singleton import Singleton
-from engine.codec.gen.rpc_client import factory_client
-from engine.codec.gen.rpc_server import factory_server
+from engine.codec.gen.proto_client import factory_client
+from engine.codec.gen.proto_server import factory_server
 
 
 class CodecMgr(Singleton):
@@ -24,7 +24,10 @@ class CodecMgr(Singleton):
         return factory_server.proto_id2name.get(proto_id, "")
 
     def get_proto_id(self, proto_name):
+
         _id = factory_client.proto_name2id.get(proto_name, 0)
+        import logging
+        logging.info(f" proto_name:{proto_name}, _id:{_id}")
         if _id != 0:
             return _id
         return factory_server.proto_name2id.get(proto_name, 0)

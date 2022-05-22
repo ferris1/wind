@@ -2,7 +2,7 @@ from engine.utils.Singleton import Singleton
 from engine.utils.Const import SeverType
 from engine import SrvEngine
 import logging
-from engine.codec.proto_importer import S_PlayerRegister,PlayerLoginResponse
+from engine.codec.proto_importer import S_PlayerRegister,PlayerLoginResponse,S_PlayerUnRegister
 from engine.client.ClientMgr import ClientMgr
 
 
@@ -22,10 +22,23 @@ class GateRouterMgr(Singleton):
         self.player2server = {}
         self.load_router()
 
+    def on_player_leave(self, player_id):
+        logging.info(f"on_player_leave player_id:{player_id}")
+        srv_id=  self.get_player_bind_server(player_id)
+        if srv_id:
+            self.player2server.pop(srv_id,None)
+            self.send_unregister_player(player_id, srv_id)
+
+    def send_unregister_player(self, player_id, srv_id):
+        sync = S_PlayerUnRegister()
+        sync.player_id = player_id
+        SrvEngine.srv_inst.send_server_message(SeverType.GAME, srv_id, player_id, sync)
+
     def load_router(self):
         for typ, lst in server_router_dict.items():
             for proto_name in lst:
                 self.cmd_router_dict[proto_name] = typ
+
 
     def get_player_bind_server(self, player_id):
         return self.player2server.get(player_id, "*")
@@ -52,11 +65,15 @@ class GateRouterMgr(Singleton):
         SrvEngine.srv_inst.send_server_message(SeverType.GAME, bind_server, player_id, sync)
 
     def on_register_ack(self, player_id, result):
+        if not result:
+            return
+
         res = PlayerLoginResponse()
         res.result = result
         res.player_id = player_id
         client = ClientMgr().get_client_by_player_id(player_id)
         if client:
+            logging.info(f"PlayerLoginResponse: {res}")
             client.send_packet(res)
         else:
             logging.error(f"no client of player:{player_id}")

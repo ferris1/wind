@@ -70,7 +70,7 @@ async def main():
         '127.0.0.1', 50100)
     req = PlayerLoginRequest()
     req.player_id = "ferris1/wind"
-    msg_id = CodecMgr().get_proto_id(req.DESCRIPTOR.full_name)
+    msg_id = CodecMgr().get_proto_id(req.DESCRIPTOR.name)
     mess = ClientMessage()
     mess.msg_id = msg_id
     mess.data = CodecMgr().encode(req)

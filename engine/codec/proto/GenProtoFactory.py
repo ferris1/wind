@@ -155,13 +155,13 @@ def gen_proto_cs(out_path, class_name):
 if __name__ == '__main__':
     # protoc 3.20 不在直接生成协议兑对象了 改成动态生成了
     # 这里使用
-    load_meta('../engine/codec/proto/rpc_client', 'menu.txt')
-    gen_proto_py('../engine/codec/gen/rpc_client/factory_client.py')
+    load_meta('../engine/codec/proto/proto_client', 'menu.txt')
+    gen_proto_py('../engine/codec/gen/proto_client/factory_client.py')
 
     gen_proto_cs('../sdks/unity/ProtoGen/GenProtoFactory.cs', 'ProtoFactoryPb')
-    print('success gen gen_proto_factory.rpc_client')
+    print('success gen gen_proto_factory.proto_client')
 
-    load_meta('../engine/codec/proto/rpc_server', 'menu.txt')
-    gen_proto_py('../engine/codec/gen/rpc_server/factory_server.py')
+    load_meta('../engine/codec/proto/proto_server', 'menu.txt')
+    gen_proto_py('../engine/codec/gen/proto_server/factory_server.py')
     print('success gen factory_server.factory_server')
 

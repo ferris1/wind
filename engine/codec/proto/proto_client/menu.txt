@@ -1,0 +1,3 @@
+Engine.proto = 100
+Player.proto = 1000
+Room.proto = 1100

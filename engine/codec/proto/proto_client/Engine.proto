@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package  WindNetwork;
+
 message HeartbeatRequest
 {
     string player_id = 1;

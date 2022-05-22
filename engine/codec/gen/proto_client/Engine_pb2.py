@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x45ngine.proto\"%\n\x10HeartbeatRequest\x12\x11\n\tplayer_id\x18\x01 \x01(\tb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x45ngine.proto\x12\x0bWindNetwork\"%\n\x10HeartbeatRequest\x12\x11\n\tplayer_id\x18\x01 \x01(\tb\x06proto3')
 
 
 
@@ -22,13 +22,13 @@ _HEARTBEATREQUEST = DESCRIPTOR.message_types_by_name['HeartbeatRequest']
 HeartbeatRequest = _reflection.GeneratedProtocolMessageType('HeartbeatRequest', (_message.Message,), {
   'DESCRIPTOR' : _HEARTBEATREQUEST,
   '__module__' : 'Engine_pb2'
-  # @@protoc_insertion_point(class_scope:HeartbeatRequest)
+  # @@protoc_insertion_point(class_scope:WindNetwork.HeartbeatRequest)
   })
 _sym_db.RegisterMessage(HeartbeatRequest)
 
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _HEARTBEATREQUEST._serialized_start=16
-  _HEARTBEATREQUEST._serialized_end=53
+  _HEARTBEATREQUEST._serialized_start=29
+  _HEARTBEATREQUEST._serialized_end=66
 # @@protoc_insertion_point(module_scope)
