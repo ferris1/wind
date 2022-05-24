@@ -41,3 +41,55 @@ message SpeakOnWorldResponse
 }
 
 
+message Vector3
+{
+    float x = 1;
+    float y = 2;
+    float z = 3;
+}
+
+message Vector2
+{
+    float x = 1;
+    float y = 2;
+}
+
+message PlayerMoveRequest
+{
+    Vector2 move = 1;
+    Vector2 look = 2;
+    string player_id = 3;
+}
+
+message PlayerMoveResponse
+{
+    Vector2 move = 1;
+    Vector2 look = 2;
+    string player_id = 3;
+}
+
+message PlayerJoinRoomRequest
+{
+    string player_id = 1;
+}
+
+message PlayerJoinRoomResponse
+{
+    string player_id = 1;
+    bool result = 2;
+}
+
+message PlayerUpdateTransformRequest
+{
+    string player_id = 1;
+    Vector3 position = 2;
+    Vector3 rotation = 3;
+}
+
+message  PlayerUpdateTransformResponse
+{
+    string player_id = 1;
+    Vector3 position = 2;
+    Vector3 rotation = 3;
+}
+

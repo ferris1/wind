@@ -3,4 +3,3 @@
 from engine.codec.gen.proto_client.Player_pb2 import *
 from engine.codec.gen.proto_server.Game_pb2 import *
 from engine.codec.gen.proto_client.Engine_pb2 import *
-from engine.codec.gen.proto_client.Room_pb2 import *

@@ -1,6 +1,6 @@
 from engine.utils.Singleton import Singleton
 from engine.codec.proto_importer import S_PlayerRegisterAck, S_PlayerUnRegisterAck, SpeakOnWorldResponse,\
-    PlayerMoveResponse,PlayerJoinRoomResponse
+    PlayerMoveResponse,PlayerJoinRoomResponse,PlayerUpdateTransformResponse
 from engine import SrvEngine
 from engine.utils.Const import SeverType
 import logging
@@ -53,3 +53,10 @@ class GamePlayerMgr(Singleton):
             res.result = True
             SrvEngine.srv_inst.send_response_by_gateway(other_id, res, sid=svr)
 
+    def player_update_transform(self, player_id, request):
+        for other_id, svr in self.player2server.items():
+            res = PlayerUpdateTransformResponse()
+            res.player_id = player_id
+            res.position.CopyFrom(request.position)
+            res.rotation.CopyFrom(request.rotation)
+            SrvEngine.srv_inst.send_response_by_gateway(other_id, res, sid=svr)
