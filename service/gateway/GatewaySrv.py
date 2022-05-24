@@ -26,7 +26,7 @@ class GatewaySrv(Engine):
         self.register_client_cmd(client_cmd)
 
     async def on_client_request(self, client, cmd, request):
-        logging.info(f"on_client_request cmd:{cmd} ")
+        # logging.info(f"on_client_request cmd:{cmd} ")
         server_type = GateRouterMgr().get_cmd_router_server(cmd)
         if server_type != self.server_type:  # 如果是路由消息  直接转发服务器消息给对应服务器
             srv_id = GateRouterMgr().get_player_bind_server(client.player_id)
@@ -41,7 +41,7 @@ class GatewaySrv(Engine):
         if not self.is_external:
             logging.error("not external, can not send response to client")
             return
-        logging.info(f"send_response_client.pid:{pid} pck:{pck}")
+        # logging.info(f"send_response_client.pid:{pid} pck:{pck}")
         client = ClientMgr().get_client_by_player_id(pid)
         client.send_packet(pck)
 
@@ -50,7 +50,7 @@ class GatewaySrv(Engine):
         if GET_MESSAGE_TYPE(cmd) == MessageType.PlayerResponse:
             self.send_response_client(pid, pck)
             return
-        logging.info(f"on_server_message:pid:{pid}, cmd:{cmd}, pck:{pck}")
+        # logging.info(f"on_server_message:pid:{pid}, cmd:{cmd}, pck:{pck}")
         func = self.get_server_cmd(cmd)
         if func:
             if asyncio.iscoroutinefunction(func):
