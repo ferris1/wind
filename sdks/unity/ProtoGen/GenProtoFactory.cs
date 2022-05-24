@@ -21,12 +21,12 @@ namespace WindNetwork
 				case 1006:
 					var res1006 = new SpeakOnWorldResponse();
 					return res1006;
-				case 1104:
-					var res1104 = new PlayerMoveResponse();
-					return res1104;
-				case 1106:
-					var res1106 = new PlayerJoinRoomResponse();
-					return res1106;
+				case 1010:
+					var res1010 = new PlayerMoveResponse();
+					return res1010;
+				case 1012:
+					var res1012 = new PlayerJoinRoomResponse();
+					return res1012;
 
 			}
 			return null;
@@ -46,10 +46,10 @@ namespace WindNetwork
 				case 1006:
 					ret = SpeakOnWorldResponse.Parser.ParseFrom(dataBytes);
 					return ret;
-				case 1104:
+				case 1010:
 					ret = PlayerMoveResponse.Parser.ParseFrom(dataBytes);
 					return ret;
-				case 1106:
+				case 1012:
 					ret = PlayerJoinRoomResponse.Parser.ParseFrom(dataBytes);
 					return ret;
 
@@ -70,10 +70,10 @@ namespace WindNetwork
 				case 1006:
 					WindHandler.On_SpeakOnWorldResponse((SpeakOnWorldResponse)m);
 				break;
-				case 1104:
+				case 1010:
 					WindHandler.On_PlayerMoveResponse((PlayerMoveResponse)m);
 				break;
-				case 1106:
+				case 1012:
 					WindHandler.On_PlayerJoinRoomResponse((PlayerJoinRoomResponse)m);
 				break;
 
@@ -99,17 +99,17 @@ namespace WindNetwork
 				case "SpeakOnWorldResponse":
 					return 1006;
 				case "Vector3":
-					return 1101;
+					return 1007;
 				case "Vector2":
-					return 1102;
+					return 1008;
 				case "PlayerMoveRequest":
-					return 1103;
+					return 1009;
 				case "PlayerMoveResponse":
-					return 1104;
+					return 1010;
 				case "PlayerJoinRoomRequest":
-					return 1105;
+					return 1011;
 				case "PlayerJoinRoomResponse":
-					return 1106;
+					return 1012;
 
 			}
 			return 0;
