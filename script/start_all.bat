@@ -1,4 +1,4 @@
-set PYTHONPATH=../;
+set PYTHONPATH=..;
 
 start "GameSrv" cmd /c "python -m service.game.GameSrv 50200 False & pause"
 
