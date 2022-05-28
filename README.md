@@ -51,4 +51,4 @@ git clone <https://github.com/ferris1/wind.git>
 
 # 使用案例
 
-[案例视频](https://www.bilibili.com/video/BV1w541197in/)     [案例文档](https://www.yuque.com/yuqueyonghu2yz87x/vmgg56/mudakg)
+[案例视频](https://www.bilibili.com/video/BV1w541197in/)     [案例文档](https://www.yuque.com/yuqueyonghu2yz87x/vmgg56/mudakg)  [案例代码](https://github.com/ferris1/WindDemo)
