@@ -27,7 +27,7 @@ class CodecMgr(Singleton):
 
         _id = factory_client.proto_name2id.get(proto_name, 0)
         import logging
-        logging.info(f" proto_name:{proto_name}, _id:{_id}")
+
         if _id != 0:
             return _id
         return factory_server.proto_name2id.get(proto_name, 0)

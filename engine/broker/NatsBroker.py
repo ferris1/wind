@@ -48,25 +48,25 @@ class NatsBroker:
     async def on_nats_message(self, msg):
         data = msg.data
         pid, cmd, pck = BrokerPack().unpack(data)
-        logging.info(f"on_nats_message:{msg} ")
+        # logging.info(f"on_nats_message:{msg} ")
         await self.srv_inst.on_server_message(pid, cmd, pck)
 
     async def send_to_server(self, server_id, data):
         if not self.connect_status or not self.nats_c:
             return
-        logging.info(f"send_to_server:server_id:{server_id} data:{data}")
+        # logging.info(f"send_to_server:server_id:{server_id} data:{data}")
         await self.nats_c.publish(server_id, data)
 
     async def send_to_group_server(self, server_type, data):
         if not self.connect_status or not self.nats_c:
             return
-        logging.info(f"send_to_group_server:server_type:{server_type} data:{data}")
+        # logging.info(f"send_to_group_server:server_type:{server_type} data:{data}")
         await self.nats_c.publish(str(server_type), data)
 
     async def send_to_all_server(self, data):
         if not self.connect_status or not self.nats_c:
             return
-        logging.info(f"send_to_all_server: data:{data}")
+        # logging.info(f"send_to_all_server: data:{data}")
         await self.nats_c.publish(str(SeverType.ALLSERVER), data)
 
 

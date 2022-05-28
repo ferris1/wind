@@ -27,6 +27,9 @@ namespace WindNetwork
 				case 1012:
 					var res1012 = new PlayerJoinRoomResponse();
 					return res1012;
+				case 1014:
+					var res1014 = new PlayerUpdateTransformResponse();
+					return res1014;
 
 			}
 			return null;
@@ -52,6 +55,9 @@ namespace WindNetwork
 				case 1012:
 					ret = PlayerJoinRoomResponse.Parser.ParseFrom(dataBytes);
 					return ret;
+				case 1014:
+					ret = PlayerUpdateTransformResponse.Parser.ParseFrom(dataBytes);
+					return ret;
 
 			}
 			return null;
@@ -75,6 +81,9 @@ namespace WindNetwork
 				break;
 				case 1012:
 					WindHandler.On_PlayerJoinRoomResponse((PlayerJoinRoomResponse)m);
+				break;
+				case 1014:
+					WindHandler.On_PlayerUpdateTransformResponse((PlayerUpdateTransformResponse)m);
 				break;
 
 			}
@@ -110,6 +119,10 @@ namespace WindNetwork
 					return 1011;
 				case "PlayerJoinRoomResponse":
 					return 1012;
+				case "PlayerUpdateTransformRequest":
+					return 1013;
+				case "PlayerUpdateTransformResponse":
+					return 1014;
 
 			}
 			return 0;
@@ -127,6 +140,8 @@ namespace WindNetwork
 		public static readonly string PlayerMoveResponse_NAME = "PlayerMoveResponse";
 		public static readonly string PlayerJoinRoomRequest_NAME = "PlayerJoinRoomRequest";
 		public static readonly string PlayerJoinRoomResponse_NAME = "PlayerJoinRoomResponse";
+		public static readonly string PlayerUpdateTransformRequest_NAME = "PlayerUpdateTransformRequest";
+		public static readonly string PlayerUpdateTransformResponse_NAME = "PlayerUpdateTransformResponse";
 
 	}
 }

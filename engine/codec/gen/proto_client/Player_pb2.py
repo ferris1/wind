@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0cPlayer.proto\x12\x0bWindNetwork\"\'\n\x12PlayerLoginRequest\x12\x11\n\tplayer_id\x18\x01 \x01(\t\"8\n\x13PlayerLoginResponse\x12\x11\n\tplayer_id\x18\x01 \x01(\t\x12\x0e\n\x06result\x18\x02 \x01(\x08\"7\n\x11\x43reateRoleRequest\x12\x11\n\tplayer_id\x18\x01 \x01(\t\x12\x0f\n\x07role_id\x18\x02 \x01(\x05\"H\n\x12\x43reateRoleResponse\x12\x11\n\tplayer_id\x18\x01 \x01(\t\x12\x0f\n\x07role_id\x18\x02 \x01(\x05\x12\x0e\n\x06result\x18\x03 \x01(\x08\"G\n\x13SpeakOnWorldRequest\x12\x11\n\tplayer_id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\"G\n\x14SpeakOnWorldResponse\x12\x10\n\x08speak_id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\"*\n\x07Vector3\x12\t\n\x01x\x18\x01 \x01(\x02\x12\t\n\x01y\x18\x02 \x01(\x02\x12\t\n\x01z\x18\x03 \x01(\x02\"\x1f\n\x07Vector2\x12\t\n\x01x\x18\x01 \x01(\x02\x12\t\n\x01y\x18\x02 \x01(\x02\"n\n\x11PlayerMoveRequest\x12\"\n\x04move\x18\x01 \x01(\x0b\x32\x14.WindNetwork.Vector2\x12\"\n\x04look\x18\x02 \x01(\x0b\x32\x14.WindNetwork.Vector2\x12\x11\n\tplayer_id\x18\x03 \x01(\t\"o\n\x12PlayerMoveResponse\x12\"\n\x04move\x18\x01 \x01(\x0b\x32\x14.WindNetwork.Vector2\x12\"\n\x04look\x18\x02 \x01(\x0b\x32\x14.WindNetwork.Vector2\x12\x11\n\tplayer_id\x18\x03 \x01(\t\"*\n\x15PlayerJoinRoomRequest\x12\x11\n\tplayer_id\x18\x01 \x01(\t\";\n\x16PlayerJoinRoomResponse\x12\x11\n\tplayer_id\x18\x01 \x01(\t\x12\x0e\n\x06result\x18\x02 \x01(\x08\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0cPlayer.proto\x12\x0bWindNetwork\"\'\n\x12PlayerLoginRequest\x12\x11\n\tplayer_id\x18\x01 \x01(\t\"8\n\x13PlayerLoginResponse\x12\x11\n\tplayer_id\x18\x01 \x01(\t\x12\x0e\n\x06result\x18\x02 \x01(\x08\"7\n\x11\x43reateRoleRequest\x12\x11\n\tplayer_id\x18\x01 \x01(\t\x12\x0f\n\x07role_id\x18\x02 \x01(\x05\"H\n\x12\x43reateRoleResponse\x12\x11\n\tplayer_id\x18\x01 \x01(\t\x12\x0f\n\x07role_id\x18\x02 \x01(\x05\x12\x0e\n\x06result\x18\x03 \x01(\x08\"G\n\x13SpeakOnWorldRequest\x12\x11\n\tplayer_id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\"G\n\x14SpeakOnWorldResponse\x12\x10\n\x08speak_id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\"*\n\x07Vector3\x12\t\n\x01x\x18\x01 \x01(\x02\x12\t\n\x01y\x18\x02 \x01(\x02\x12\t\n\x01z\x18\x03 \x01(\x02\"\x1f\n\x07Vector2\x12\t\n\x01x\x18\x01 \x01(\x02\x12\t\n\x01y\x18\x02 \x01(\x02\"n\n\x11PlayerMoveRequest\x12\"\n\x04move\x18\x01 \x01(\x0b\x32\x14.WindNetwork.Vector2\x12\"\n\x04look\x18\x02 \x01(\x0b\x32\x14.WindNetwork.Vector2\x12\x11\n\tplayer_id\x18\x03 \x01(\t\"o\n\x12PlayerMoveResponse\x12\"\n\x04move\x18\x01 \x01(\x0b\x32\x14.WindNetwork.Vector2\x12\"\n\x04look\x18\x02 \x01(\x0b\x32\x14.WindNetwork.Vector2\x12\x11\n\tplayer_id\x18\x03 \x01(\t\"*\n\x15PlayerJoinRoomRequest\x12\x11\n\tplayer_id\x18\x01 \x01(\t\";\n\x16PlayerJoinRoomResponse\x12\x11\n\tplayer_id\x18\x01 \x01(\t\x12\x0e\n\x06result\x18\x02 \x01(\x08\"\x81\x01\n\x1cPlayerUpdateTransformRequest\x12\x11\n\tplayer_id\x18\x01 \x01(\t\x12&\n\x08position\x18\x02 \x01(\x0b\x32\x14.WindNetwork.Vector3\x12&\n\x08rotation\x18\x03 \x01(\x0b\x32\x14.WindNetwork.Vector3\"\x82\x01\n\x1dPlayerUpdateTransformResponse\x12\x11\n\tplayer_id\x18\x01 \x01(\t\x12&\n\x08position\x18\x02 \x01(\x0b\x32\x14.WindNetwork.Vector3\x12&\n\x08rotation\x18\x03 \x01(\x0b\x32\x14.WindNetwork.Vector3b\x06proto3')
 
 
 
@@ -30,6 +30,8 @@ _PLAYERMOVEREQUEST = DESCRIPTOR.message_types_by_name['PlayerMoveRequest']
 _PLAYERMOVERESPONSE = DESCRIPTOR.message_types_by_name['PlayerMoveResponse']
 _PLAYERJOINROOMREQUEST = DESCRIPTOR.message_types_by_name['PlayerJoinRoomRequest']
 _PLAYERJOINROOMRESPONSE = DESCRIPTOR.message_types_by_name['PlayerJoinRoomResponse']
+_PLAYERUPDATETRANSFORMREQUEST = DESCRIPTOR.message_types_by_name['PlayerUpdateTransformRequest']
+_PLAYERUPDATETRANSFORMRESPONSE = DESCRIPTOR.message_types_by_name['PlayerUpdateTransformResponse']
 PlayerLoginRequest = _reflection.GeneratedProtocolMessageType('PlayerLoginRequest', (_message.Message,), {
   'DESCRIPTOR' : _PLAYERLOGINREQUEST,
   '__module__' : 'Player_pb2'
@@ -114,6 +116,20 @@ PlayerJoinRoomResponse = _reflection.GeneratedProtocolMessageType('PlayerJoinRoo
   })
 _sym_db.RegisterMessage(PlayerJoinRoomResponse)
 
+PlayerUpdateTransformRequest = _reflection.GeneratedProtocolMessageType('PlayerUpdateTransformRequest', (_message.Message,), {
+  'DESCRIPTOR' : _PLAYERUPDATETRANSFORMREQUEST,
+  '__module__' : 'Player_pb2'
+  # @@protoc_insertion_point(class_scope:WindNetwork.PlayerUpdateTransformRequest)
+  })
+_sym_db.RegisterMessage(PlayerUpdateTransformRequest)
+
+PlayerUpdateTransformResponse = _reflection.GeneratedProtocolMessageType('PlayerUpdateTransformResponse', (_message.Message,), {
+  'DESCRIPTOR' : _PLAYERUPDATETRANSFORMRESPONSE,
+  '__module__' : 'Player_pb2'
+  # @@protoc_insertion_point(class_scope:WindNetwork.PlayerUpdateTransformResponse)
+  })
+_sym_db.RegisterMessage(PlayerUpdateTransformResponse)
+
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
@@ -141,4 +157,8 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _PLAYERJOINROOMREQUEST._serialized_end=749
   _PLAYERJOINROOMRESPONSE._serialized_start=751
   _PLAYERJOINROOMRESPONSE._serialized_end=810
+  _PLAYERUPDATETRANSFORMREQUEST._serialized_start=813
+  _PLAYERUPDATETRANSFORMREQUEST._serialized_end=942
+  _PLAYERUPDATETRANSFORMRESPONSE._serialized_start=945
+  _PLAYERUPDATETRANSFORMRESPONSE._serialized_end=1075
 # @@protoc_insertion_point(module_scope)

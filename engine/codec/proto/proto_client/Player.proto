@@ -40,6 +40,7 @@ message SpeakOnWorldResponse
     string content = 3;
 }
 
+
 message Vector3
 {
     float x = 1;
@@ -77,3 +78,18 @@ message PlayerJoinRoomResponse
     string player_id = 1;
     bool result = 2;
 }
+
+message PlayerUpdateTransformRequest
+{
+    string player_id = 1;
+    Vector3 position = 2;
+    Vector3 rotation = 3;
+}
+
+message  PlayerUpdateTransformResponse
+{
+    string player_id = 1;
+    Vector3 position = 2;
+    Vector3 rotation = 3;
+}
+
