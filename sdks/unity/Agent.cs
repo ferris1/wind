@@ -24,19 +24,19 @@ namespace WindNetwork
 
         private readonly Thread thread;
 
-        // ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        // ¿Í»§¶ËÇëÇó¶ÓÁÐ
         private ConcurrentQueue<ClientRequest> RequestQue;
-        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½
+        // ·þÎñÆ÷ÏûÏ¢¶ÓÁÐ
         private ConcurrentQueue<ServerMessage> MessageQue;
 
-        // ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        // ¿Í»§¶ËÇëÇó
         public delegate bool RequestFunc(object o);
         private sealed class ClientRequest
         {
             public RequestFunc RequestFunc = null;
             public object Data;
         }
-        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        // ·þÎñÆ÷´¦Àíº¯Êý
         public delegate void HandlerFunc(object o);
         class ServerMessage
         {
@@ -46,7 +46,6 @@ namespace WindNetwork
 
         private Agent()
         {
-            MsgPack.GenInstance();
             RequestQue = new ConcurrentQueue<ClientRequest>();
             MessageQue = new ConcurrentQueue<ServerMessage>();
             thread = new Thread(RequestThread);
@@ -60,20 +59,9 @@ namespace WindNetwork
 
             if (_instance == null)
             {
-                Debug.LogError($"instance is:{_instance}");
+                _instance = new Agent();
             }
             return _instance;
-        }
-
-        public static void GenInstance()
-        {
-
-            if (_instance != null)
-            {
-                Debug.Log("re Gen Agent instance");
-                return;
-            }
-            _instance = new Agent();
         }
 
         #region Connect
@@ -119,15 +107,15 @@ namespace WindNetwork
             RequestQue.Enqueue(req);
         }
         
-        // ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        // ÍøÂçÏß³Ì  ´¦Àí·¢ËÍÊý¾ÝÓë½ÓÊÜÊý¾Ý
         private void RequestThread()
         {
-            Thread.CurrentThread.Name = "Network";
+            Thread.CurrentThread.Name = "WindNetwork";
             while (!stopped)
             {
                 try
                 {
-                    // ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½
+                    // ´¦Àí·¢ËÍµÄÊý¾Ý
                     ClientRequest request;
                     while (RequestQue.TryDequeue(out request))
                     {
@@ -137,7 +125,7 @@ namespace WindNetwork
                         }
 
                     }
-                    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                    // ´¦Àí½ÓÊÜÊý¾Ý
                     if (tcp != null)
                     {
                         lock (connectionLock)
@@ -162,7 +150,7 @@ namespace WindNetwork
             MessageQue.Enqueue(msg);
         }
 
-        // ï¿½ï¿½ï¿½ß³Ìµï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ÌµÄ°ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½
+        // Ö÷Ïß³Ìµ÷ÓÃ£¬ÍøÂçÏß³ÌµÄ°ü»á»Øµ÷µ½Ö÷ÏßÏß³Ì
         public void NetUpdate()
         {
             ServerMessage msg;

@@ -124,7 +124,6 @@ class Engine:
     # 如果是直连客户端的服务器 第一个参数是client否者是player_id
     # 如果是外部服务器 可以继承重写方法
     async def on_server_message(self, pid, cmd, pck):
-        logging.info(f"on_server_message:pid:{pid}, cmd:{cmd}, pck:{pck}")
         # 查看是否是转发过来的客户端包 是的话由客户端来处理
         if self.get_client_cmd(cmd):
             await self.on_client_request(pid, cmd, pck)

@@ -10,24 +10,22 @@ proto_id2name = dict()
 proto_name2id = dict()
 proto_name2type = dict()
 
-{class_id_statement}
+{proto_id_code}
 '''
 
 CS_PROTO_FACTORY_TEMPLATE = '''
 // do not edit. gen by server codec
-using System;
-using System.Collections.Generic;
 using Google.Protobuf;
 
 namespace WindNetwork
 {
-	public partial class {class_name}
+	public partial class ProtoFactoryPb
 	{
 		public static IMessage GetProtoObj(int protoId)
 		{
 			switch (protoId)
 			{
-{ori_class_statement}
+{get_proto_obj_code}
 			}
 			return null;
 		}
@@ -37,7 +35,7 @@ namespace WindNetwork
 			IMessage ret;
 			switch (protoId)
 			{
-{class_id_statement}
+{decode_proto_data}
 			}
 			return null;
 		}
@@ -46,7 +44,7 @@ namespace WindNetwork
 		{
 			switch (protoId)
 			{
-{class_call_statement}
+{proto_callback_code}
 			}
 		}	
 
@@ -54,17 +52,16 @@ namespace WindNetwork
 		{
 			switch (name)
 			{
-{class_mid_statement}
+{get_id_code}
 			}
 			return 0;
-		}	
-{class_def}
+		}
 	}
 }
 '''
 
 
-def load_meta(menu_path, menu_file, filters=None):
+def load_menu(menu_path, menu_file, filters=None):
     proto_to_id.clear()
     method_to_id.clear()
 
@@ -113,14 +110,14 @@ def gen_proto_py(out_path):
     final_str += output_obj.getvalue()
     fout = open(out_path, 'w', encoding='UTF-8', newline='')
     fout.write(
-        PY_PROTO_FACTORY_TEMPLATE.format(class_id_statement=final_str))
+        PY_PROTO_FACTORY_TEMPLATE.format(proto_id_code=final_str))
     fout.close()
 
 
-def gen_proto_cs(out_path, class_name):
+def gen_proto_cs(out_path):
     output_parse = io.StringIO()
     output_call = io.StringIO()
-    output_def = io.StringIO()
+
     output_mid = io.StringIO()
     output_ori = io.StringIO()
 
@@ -135,19 +132,16 @@ def gen_proto_cs(out_path, class_name):
             output_call.write("\t\t\t\t\tWindHandler.On_{0}(({0})m);\n".format(k))
             output_call.write("\t\t\t\tbreak;\n")
             output_ori.write("\t\t\t\tcase {}:\n".format(v))
-            output_ori.write("\t\t\t\t\tvar res{} = new {}();\n".format(v, k))
-            output_ori.write("\t\t\t\t\treturn res{};\n".format(v))
-        output_def.write("\t\tpublic static readonly string {0}_NAME = \"{0}\";\n".format(k))
+            output_ori.write("\t\t\t\t\tvar proto{} = new {}();\n".format(v, k))
+            output_ori.write("\t\t\t\t\treturn proto{};\n".format(v))
         output_mid.write('\t\t\t\tcase \"{}\":\n'.format(k))
         output_mid.write("\t\t\t\t\treturn {};\n".format(v))
 
     fout = open(out_path, 'w', encoding='UTF-8', newline='')
-    final_str = CS_PROTO_FACTORY_TEMPLATE.replace('{class_id_statement}', output_parse.getvalue())
-    final_str = final_str.replace('{ori_class_statement}', output_ori.getvalue())
-    final_str = final_str.replace('{class_call_statement}', output_call.getvalue())
-    final_str = final_str.replace('{class_def}', output_def.getvalue())
-    final_str = final_str.replace('{class_mid_statement}', output_mid.getvalue())
-    final_str = final_str.replace('{class_name}', class_name)
+    final_str = CS_PROTO_FACTORY_TEMPLATE.replace('{decode_proto_data}', output_parse.getvalue())
+    final_str = final_str.replace('{get_proto_obj_code}', output_ori.getvalue())
+    final_str = final_str.replace('{proto_callback_code}', output_call.getvalue())
+    final_str = final_str.replace('{get_id_code}', output_mid.getvalue())
     fout.write(final_str)
     fout.close()
 
@@ -155,13 +149,13 @@ def gen_proto_cs(out_path, class_name):
 if __name__ == '__main__':
     # protoc 3.20 不在直接生成协议兑对象了 改成动态生成了
     # 这里使用
-    load_meta('../engine/codec/proto/proto_client', 'menu.txt')
+    load_menu('../engine/codec/proto/proto_client', 'menu.txt')
     gen_proto_py('../engine/codec/gen/proto_client/factory_client.py')
 
-    gen_proto_cs('../sdks/unity/ProtoGen/GenProtoFactory.cs', 'ProtoFactoryPb')
+    gen_proto_cs('../sdks/unity/ProtoGen/GenProtoFactory.cs')
     print('success gen gen_proto_factory.proto_client')
 
-    load_meta('../engine/codec/proto/proto_server', 'menu.txt')
+    load_menu('../engine/codec/proto/proto_server', 'menu.txt')
     gen_proto_py('../engine/codec/gen/proto_server/factory_server.py')
     print('success gen factory_server.factory_server')
 

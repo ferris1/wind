@@ -16,15 +16,11 @@ namespace WindNetwork
             get
             {
                 if (inst == null)
-                    Debug.LogError("call MsgPack inst error");
+                    inst = new MsgPack();
                 return inst;
             }
         }
 
-        public static void GenInstance()
-        {
-            inst = new MsgPack();
-        }
 
         public int GetHeadLen()
         {

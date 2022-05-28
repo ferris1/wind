@@ -1,7 +1,5 @@
 
 // do not edit. gen by server codec
-using System;
-using System.Collections.Generic;
 using Google.Protobuf;
 
 namespace WindNetwork
@@ -13,23 +11,23 @@ namespace WindNetwork
 			switch (protoId)
 			{
 				case 1002:
-					var res1002 = new PlayerLoginResponse();
-					return res1002;
+					var proto1002 = new PlayerLoginResponse();
+					return proto1002;
 				case 1004:
-					var res1004 = new CreateRoleResponse();
-					return res1004;
+					var proto1004 = new CreateRoleResponse();
+					return proto1004;
 				case 1006:
-					var res1006 = new SpeakOnWorldResponse();
-					return res1006;
+					var proto1006 = new SpeakOnWorldResponse();
+					return proto1006;
 				case 1010:
-					var res1010 = new PlayerMoveResponse();
-					return res1010;
+					var proto1010 = new PlayerMoveResponse();
+					return proto1010;
 				case 1012:
-					var res1012 = new PlayerJoinRoomResponse();
-					return res1012;
+					var proto1012 = new PlayerJoinRoomResponse();
+					return proto1012;
 				case 1014:
-					var res1014 = new PlayerUpdateTransformResponse();
-					return res1014;
+					var proto1014 = new PlayerUpdateTransformResponse();
+					return proto1014;
 
 			}
 			return null;
@@ -126,22 +124,6 @@ namespace WindNetwork
 
 			}
 			return 0;
-		}	
-		public static readonly string HeartbeatRequest_NAME = "HeartbeatRequest";
-		public static readonly string PlayerLoginRequest_NAME = "PlayerLoginRequest";
-		public static readonly string PlayerLoginResponse_NAME = "PlayerLoginResponse";
-		public static readonly string CreateRoleRequest_NAME = "CreateRoleRequest";
-		public static readonly string CreateRoleResponse_NAME = "CreateRoleResponse";
-		public static readonly string SpeakOnWorldRequest_NAME = "SpeakOnWorldRequest";
-		public static readonly string SpeakOnWorldResponse_NAME = "SpeakOnWorldResponse";
-		public static readonly string Vector3_NAME = "Vector3";
-		public static readonly string Vector2_NAME = "Vector2";
-		public static readonly string PlayerMoveRequest_NAME = "PlayerMoveRequest";
-		public static readonly string PlayerMoveResponse_NAME = "PlayerMoveResponse";
-		public static readonly string PlayerJoinRoomRequest_NAME = "PlayerJoinRoomRequest";
-		public static readonly string PlayerJoinRoomResponse_NAME = "PlayerJoinRoomResponse";
-		public static readonly string PlayerUpdateTransformRequest_NAME = "PlayerUpdateTransformRequest";
-		public static readonly string PlayerUpdateTransformResponse_NAME = "PlayerUpdateTransformResponse";
-
+		}
 	}
 }
