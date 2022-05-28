@@ -7,6 +7,7 @@ public static partial class WindHandler
     public static void On_PlayerLoginResponse(WindNetwork.PlayerLoginResponse pck)
     {
         Debug.Log($"recv packet:{pck}");
+        // 服务器回包后，客户端逻辑可以在这里加 比如，登录成功后 开始游戏
         GameMgr.inst.OnStartGame();
     }
     public static void On_CreateRoleResponse(WindNetwork.CreateRoleResponse pck)
