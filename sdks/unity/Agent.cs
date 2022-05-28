@@ -71,8 +71,10 @@ namespace WindNetwork
             GetInstance().isConnected = true;
             return true;
         };
-        public void ConnectToServer()
+        public void ConnectToServer(string _ip, int _port)
         {
+            ip = _ip;
+            port = _port;
             AddNetworkThreadTask(ConnectFunc);
         }
         #endregion
@@ -167,7 +169,6 @@ namespace WindNetwork
             {
                 isConnected = false;
                 tcp.socket.Close();
-                Debug.Log("Disconnected from server.");
             }
         }
 
