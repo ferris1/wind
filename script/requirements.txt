@@ -3,3 +3,5 @@ aioetcd3==1.13
 nats-py==2.1.0
 coloredlogs==15.0.1
 aioredis==2.0.1
+pymongo==4.1.1
+motor==3.0.0

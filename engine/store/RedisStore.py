@@ -1,8 +1,7 @@
 
 import aioredis
 
-# python的redis客户端使用这个: https://github.com/aio-libs/aioredis-py
-
+# 异步的redis客户端使用这个: https://github.com/aio-libs/aioredis-py
 
 class RedisStore:
     def __init__(self):

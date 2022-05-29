@@ -14,7 +14,9 @@ from engine.selector.Selector import Selector
 import asyncio
 from engine.config import Config
 from engine.store.RedisStore import RedisStore
-# python 3.9.12
+from engine.store.MongoStore import MongoStore
+
+# python 3.7+
 
 
 # Wind的核心类,engine目录下所有的组件都是附加到Engine类的
@@ -35,13 +37,12 @@ class Engine:
         self.loop = asyncio.get_event_loop()
 
         # 以下为各个插件
-
         self.registry = EtcdRegistry()
         self.broker = NatsBroker()
         self.selector = Selector()
-        self.redis_store = RedisStore()
+        self.redis_store = RedisStore()   # Redis缓存
+        self.mongo_store = MongoStore()   # Mongodb持久化存储
         
-
     async def init(self):
         init_log(self)
         logging.info("SrvEngine Init")
@@ -59,6 +60,7 @@ class Engine:
             await self.broker.init(srv_inst)
         self.selector.init(self.registry)
         self.redis_store.init(srv_inst)
+        self.mongo_store.init(srv_inst)
 
     async def register(self):
         client_cmd, server_cmd = load_all_handlers('engine.handlers')
