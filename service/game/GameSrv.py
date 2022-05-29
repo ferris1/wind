@@ -22,8 +22,7 @@ class GameSrv(Engine):
 
     async def start(self):
         await super(GameSrv, self).start()
-        
-        
+
         logging.info("start Game Srv")
 
     async def exit(self):
