@@ -13,6 +13,7 @@ from engine.utils.Const import SeverType
 from engine.selector.Selector import Selector
 import asyncio
 from engine.config import Config
+from engine.store.RedisStore import RedisStore
 # python 3.9.12
 
 
@@ -38,6 +39,8 @@ class Engine:
         self.registry = EtcdRegistry()
         self.broker = NatsBroker()
         self.selector = Selector()
+        self.redis_store = RedisStore()
+        
 
     async def init(self):
         init_log(self)
@@ -55,6 +58,7 @@ class Engine:
         if Config.USE_NATS:
             await self.broker.init(srv_inst)
         self.selector.init(self.registry)
+        self.redis_store.init(srv_inst)
 
     async def register(self):
         client_cmd, server_cmd = load_all_handlers('engine.handlers')
