@@ -8,5 +8,4 @@ class ServerHandlers:
     # rpc函数以Handler开头, 服务器的中间有个S
     @staticmethod
     async def Handler_S_PlayerRegisterAck(player_id, request:S_PlayerRegisterAck):
-        logging.info(f"S_PlayerRegisterAc player_id:{player_id}, request:{request} ")
         GateRouterMgr().on_register_ack(player_id, request.result)
