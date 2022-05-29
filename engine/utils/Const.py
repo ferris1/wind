@@ -1,6 +1,9 @@
 
 from enum import IntEnum
 
+GatewayHeartTimeOut = 30   # 心跳超时是30秒
+
+
 # Python与Go的交互命令
 class ServerCmdEnum(IntEnum):
     CmdNone = 0

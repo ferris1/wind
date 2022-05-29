@@ -62,6 +62,8 @@ class GatewaySrv(Engine):
 
     async def start(self):
         await super(GatewaySrv, self).start()
+        # 每三秒检测一次心跳是否超时
+        self.add_timer(3, ClientMgr().update)
         logging.info("start GatewaySrv")
 
     async def exit(self):

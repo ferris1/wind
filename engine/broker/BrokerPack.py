@@ -2,7 +2,7 @@ from engine.utils.Singleton import Singleton
 from engine.codec.gen.proto_client import factory_client
 from engine.codec.gen.proto_server import factory_server
 from engine.utils.Utils import uint32_to_bytes,uint_from_bytes
-import logging
+
 
 class BrokerPack(Singleton):
     def __init__(self):

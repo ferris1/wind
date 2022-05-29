@@ -8,6 +8,8 @@ from engine.codec.Codec import CodecMgr
 from engine.network.NetMessage import Message
 from engine.utils.Const import ServerCmdEnum
 from engine.network.NetMessage import MsgPack
+from engine.utils import Const
+import time
 
 class ClientStatus(IntEnum):
     NONE = 0
@@ -15,10 +17,9 @@ class ClientStatus(IntEnum):
     DISCONNECTED = 2
 
 
-
 class ClientConn:
     __slots__ = ['address', 'port', 'peer_id', 'player_id', 'session_key', 'timestamp', 'status',
-                 'session_key', 'srv']
+                 'session_key', 'srv', 'last_heartbeat_time']
 
     def __init__(self):
         self.address = None
@@ -29,6 +30,7 @@ class ClientConn:
         self.timestamp = None
         self.status = ClientStatus.NONE
         self.srv = None
+        self.last_heartbeat_time = 0
 
     def send_packet(self, pck):
         mess = Message()
@@ -45,8 +47,7 @@ class ClientConn:
 
     def set_player_id(self, player_id):
         self.player_id = player_id
-        ClientMgr().set_player_id(player_id,self)
-
+        ClientMgr().set_player_id(player_id, self)
 
 
 class ClientMgr(Singleton):
@@ -60,26 +61,44 @@ class ClientMgr(Singleton):
         logging.info("ClientMgr init ")
         self.wind_net = WindNetwork()
         await self.wind_net.start_net_worker(ip, port, self.on_net_connect, self.on_net_disconnect, self.on_net_data)
+
+    def update(self):
+        peer_lst = list(self.peer_to_client.keys())
+        now = int(time.time())
+        
+        for peer_id in peer_lst:
+            conn = self.get_client_conn_by_peer(peer_id)
+            if now - conn.last_heartbeat_time > Const.GatewayHeartTimeOut:
+                self.on_peer_heartbeat_time_out(peer_id)
+
+    def on_peer_heartbeat_time_out(self, peer_id):
+        logging.warning(f"on_peer_heartbeat_time_out.peer_id:{peer_id}")
+        client = self.get_client_conn_by_peer(peer_id)
+        SrvEngine.srv_inst.on_client_disconect(client.player_id)
+        self.peer_to_client.pop(peer_id, None)
+        self.connect_count -= 1
+
     # 与客户端的数据交互 使用callback的形式
     def on_net_connect(self, peer_id, address, port):
         logging.info(f"on_net_connect.peer_id:{peer_id},address:{address}, port:{port}")
-        conn = self.create_conn(peer_id, address, port)
-        conn.status = ClientStatus.CONNECTED
-        self.peer_to_client[peer_id] = conn
+        client = self.create_conn(peer_id, address, port)
+        client.status = ClientStatus.CONNECTED
+        client.last_heartbeat_time = time.time()
+        self.peer_to_client[peer_id] = client
         self.connect_count += 1
 
     def on_net_disconnect(self, peer_id):
         logging.info(f"on_net_disconnect.peer_id:{peer_id}")
-        conn = self.get_client_conn_by_peer(peer_id)
-        SrvEngine.srv_inst.on_client_disconect(conn.player_id)
+        client = self.get_client_conn_by_peer(peer_id)
+        SrvEngine.srv_inst.on_client_disconect(client.player_id)
         self.peer_to_client.pop(peer_id, None)
         self.connect_count -= 1
-
 
     def on_net_data(self, peer_id, proto_id, proto_data_len, proto_data):
         # logging.info(f"on_net_data.peer_id:{peer_id},proto_id:{proto_id}, proto_data_len:{proto_data_len}")
         client = self.get_client_conn_by_peer(peer_id)
         if client:
+            client.last_heartbeat_time = time.time()
             cmd = CodecMgr().get_proto_name(proto_id)
             request = CodecMgr().decode(cmd, proto_data)
             asyncio.ensure_future(SrvEngine.srv_inst.on_client_request(client, cmd, request))

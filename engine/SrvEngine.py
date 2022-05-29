@@ -152,7 +152,7 @@ class Engine:
                         func(*args, **kwargs)
                 except Exception as e:
                     logging.error(f"timer func:{func} exec error e:{e}")
-        self.loop.create_task(decorated())
+        self.loop.create_task(decorated(*args, **kwargs))
 
     def get_report_info(self):
         info = {

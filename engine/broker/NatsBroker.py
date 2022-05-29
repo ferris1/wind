@@ -24,15 +24,7 @@ class NatsBroker:
         else:
             self.connect_status = True
             logging.info(f"connect NATS_ADDR:{NATS_ADDR} success")
-        # except NoServersError as e:
-        #     logging.error("no nats server. please launch nats server first. see "
-        #                   "https://docs.nats.io/running-a-nats-service/introduction/installation")
-        # except (OSError, Error, TimeoutError) as e:
-        #     logging.error("no nats server. please launch nats server first. see "
-        #                   "https://docs.nats.io/running-a-nats-service/introduction/installation")
-        # else:
-        #     self.connect_status = True
-        #     logging.info(f"connect NATS_ADDR:{NATS_ADDR} success")
+
 
     async def subscribe(self):
         if not self.connect_status or not self.nats_c:
