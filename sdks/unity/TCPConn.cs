@@ -15,11 +15,10 @@ namespace WindNetwork
         private byte[] receiveBuffer;
         public static int dataBufferSize = 1024 * 1024;  // 1M的缓存
         private int dataIndex = 0, dataOffset = 0;
-        public const int TCP_MAX_BUFFER_SIZE = 1024 * 1024;
+        
         public TCPConn(Agent data)
         {
             agent = data;
-           
         }
 
         public void Connect(string ip, int port)
@@ -65,7 +64,7 @@ namespace WindNetwork
         {
             try
             {
-                if (socket != null)
+                if (socket != null && stream != null)
                 {
                     
                     var mess = new Message();
@@ -92,7 +91,7 @@ namespace WindNetwork
                 bool needReset = false;
                 while (stream.DataAvailable)
                 {
-                    if (dataOffset + 1024 > TCP_MAX_BUFFER_SIZE)
+                    if (dataOffset + 1024 > Const.TcpMaxBufferSize)
                     {
                         needReset = true;
                         break;
@@ -104,9 +103,9 @@ namespace WindNetwork
                 {
                     
                     var len = MsgPack.GetInstance.UnpackLen(receiveBuffer, dataIndex);
-                    if (len > TCP_MAX_BUFFER_SIZE)
+                    if (len > Const.TcpMaxBufferSize)
                     {
-                        Debug.LogError($"receive message data over:{TCP_MAX_BUFFER_SIZE}. ");
+                        Debug.LogError($"receive message data over:{Const.TcpMaxBufferSize}. ");
                         return;
                     }
                     if (dataOffset - dataIndex >= len + MsgPack.GetInstance.GetHeadLen())         

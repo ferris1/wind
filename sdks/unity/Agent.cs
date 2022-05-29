@@ -21,13 +21,20 @@ namespace WindNetwork
 
         private readonly object connectionLock = new object();
         public TCPConn tcp;
-
         private readonly Thread thread;
-
         // 客户端请求队列
         private ConcurrentQueue<ClientRequest> RequestQue;
         // 服务器消息队列
         private ConcurrentQueue<ServerMessage> MessageQue;
+
+        // 心跳
+        private float lastHeatbeatTime = 0;
+        
+        private HeartbeatRequest heatbeat = new HeartbeatRequest();
+
+        // 连接
+        private float connectTime = 0;
+     
 
         // 客户端请求
         public delegate bool RequestFunc(object o);
@@ -51,7 +58,7 @@ namespace WindNetwork
             thread = new Thread(RequestThread);
             thread.Start();
             tcp = new TCPConn(this);
-            isConnected = false;
+            ResetConn();
         }
 
         public static Agent GetInstance()
@@ -68,13 +75,14 @@ namespace WindNetwork
         private static readonly RequestFunc ConnectFunc = (o) =>
         {
             GetInstance().tcp.Connect(GetInstance().ip, GetInstance().port);
-            GetInstance().isConnected = true;
+
             return true;
         };
         public void ConnectToServer(string _ip, int _port)
         {
             ip = _ip;
             port = _port;
+            connectTime = Time.realtimeSinceStartup;
             AddNetworkThreadTask(ConnectFunc);
         }
         #endregion
@@ -109,6 +117,17 @@ namespace WindNetwork
             RequestQue.Enqueue(req);
         }
         
+        private void CheckSendHeatbeat()
+        {
+            var now = Time.realtimeSinceStartup;
+            if ( now - lastHeatbeatTime > Const.HeatBeatTime && isConnected)
+            {
+                Debug.Log("send heatbeat");
+                SendRequest(heatbeat);
+                lastHeatbeatTime = now;
+            }
+        }
+
         // 网络线程  处理发送数据与接受数据
         private void RequestThread()
         {
@@ -117,6 +136,7 @@ namespace WindNetwork
             {
                 try
                 {
+                    
                     // 处理发送的数据
                     ClientRequest request;
                     while (RequestQue.TryDequeue(out request))
@@ -125,7 +145,6 @@ namespace WindNetwork
                         {
                             var data = request.RequestFunc(request.Data);
                         }
-
                     }
                     // 处理接受数据
                     if (tcp != null)
@@ -152,37 +171,63 @@ namespace WindNetwork
             MessageQue.Enqueue(msg);
         }
 
+        public void CheckConnectTimeOut()
+        {
+            if(!isConnected && connectTime!=0 && Time.realtimeSinceStartup - connectTime > Const.ConnectTimeOut)
+            {
+                OnConnectTimeOut();
+            }
+        }
+
         // 主线程调用，网络线程的包会回调到主线线程
         public void NetUpdate()
         {
+            CheckConnectTimeOut();
             ServerMessage msg;
             while (MessageQue.TryDequeue(out msg))
             {
                 msg.Handler(msg.Data);
             }
-           
+            // 发送心跳
+            CheckSendHeatbeat();
         }
-       
+
         public void Disconnect()
         {
             if (isConnected)
             {
-                isConnected = false;
+                ResetConn();
                 tcp.socket.Close();
             }
         }
 
-      
         public void OnConnectCallback(bool succ)
         {
             Debug.Log($"OnConnectCallback succ: {succ}");
-            if(succ)
+            if (succ)
+            {
+                isConnected = true;
+                connectTime = 0;
                 GameMgr.inst.OnNetConnect(succ);
+            }
         }
 
         public void OnDisconnectCallback()
         {
 
+        }
+
+        public void OnConnectTimeOut()
+        {
+            Debug.LogError("Connect Timeout");
+            ResetConn();
+            tcp.socket.Close();
+        }
+
+        public void ResetConn()
+        {
+            isConnected = false;
+            connectTime = 0;
         }
     }
 }
